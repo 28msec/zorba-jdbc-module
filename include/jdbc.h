@@ -66,7 +66,13 @@ class JdbcModule : public ExternalModule {
 		{
       delete this;
     }
-    
+
+    static JNIEnv* getJavaEnv(const zorba::StaticContext* aStaticContext);
+
+    static String getStringArg(const ExternalFunction::Arguments_t& args, int index);
+
+    static void 
+      throwJavaException(JNIEnv *env, jthrowable& lException);
     static void
       throwError (const char *aLocalName, const char* aErrorMessage);
     static void

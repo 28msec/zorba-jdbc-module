@@ -30,18 +30,14 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::DynamicContext* aDynamincContext) const
 {
 	jthrowable lException = 0;
-  static JNIEnv *env;
+  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   jclass cDriverManager;
   jstring url, username, password;
   uuid lUUID;
   String lStrUUID;
-
-
+  
   try
   {
-    env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
-    CHECK_EXCEPTION(env);
-
 		// read input param 0
     Iterator_t lIter = args[0]->getIterator();
 		lIter->open();
@@ -114,37 +110,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 	}
 	catch (JavaException&)
 	{
-		jclass stringWriterClass = env->FindClass("java/io/StringWriter");
-		jclass printWriterClass = env->FindClass("java/io/PrintWriter");
-		jclass throwableClass = env->FindClass("java/lang/Throwable");
-		jobject stringWriter = env->NewObject(
-				stringWriterClass,
-				env->GetMethodID(stringWriterClass, "<init>", "()V"));
-
-		jobject printWriter = env->NewObject(
-				printWriterClass,
-				env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
-				stringWriter);
-
-		env->CallObjectMethod(lException,
-				env->GetMethodID(throwableClass, "printStackTrace",
-						"(Ljava/io/PrintWriter;)V"),
-				printWriter);
-
-		//env->CallObjectMethod(printWriter, env->GetMethodID(printWriterClass, "flush", "()V"));
-		jmethodID toStringMethod =
-			env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
-		jobject errorMessageObj = env->CallObjectMethod(
-				stringWriter, toStringMethod);
-		jstring errorMessage = (jstring) errorMessageObj;
-		const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
-		std::stringstream s;
-		s << "A Java Exception was thrown:" << std::endl << errMsg;
-		env->ReleaseStringUTFChars(errorMessage, errMsg);
-		std::string err("");
-		err += s.str();
-		env->ExceptionClear();
-    JdbcModule::throwError("JAVA-EXCEPTION", err);
+    JdbcModule::throwJavaException(env, lException);
 	}
   
   return ItemSequence_t(new SingletonItemSequence(theFactory->createAnyURI(lStrUUID)));   

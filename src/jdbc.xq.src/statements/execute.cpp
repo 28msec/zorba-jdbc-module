@@ -30,32 +30,13 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::DynamicContext* aDynamincContext) const
 {
 	jthrowable lException = 0;
-	static JNIEnv* env;
+  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   jobject oConnection;
-  jboolean isClosed;
 	try
   {
 		// Local variables
-    String lStrUUID;
-    Iterator_t lIter = args[0]->getIterator();
-		lIter->open();
-		Item item;
-		if( lIter->next(item) )
-		{
-      lStrUUID = item.getStringValue();
-    }
-		lIter->close();
-
-    String lQuery;
-    Iterator_t lIter = args[1]->getIterator();
-		lIter->open();
-		Item item;
-		if( lIter->next(item) )
-		{
-      lQuery = item.getStringValue();
-    }
-		lIter->close();
-
+    String lStrUUID = JdbcModule::getStringArg(args, 0);
+    String lQuery = JdbcModule::getStringArg(args, 1);
 
     DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
     InstanceMap* lInstanceMap;
@@ -67,8 +48,6 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
-    env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
-    CHECK_EXCEPTION(env);
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
     jobject statement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
@@ -77,8 +56,7 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
     jboolean executed = env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
     CHECK_EXCEPTION(env);
-    jboolean executed = env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
-    CHECK_EXCEPTION(env);
+
 
 	}
   catch (zorba::jvm::VMOpenException&)
@@ -87,37 +65,7 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
 	}
 	catch (JavaException&)
 	{
-		jclass stringWriterClass = env->FindClass("java/io/StringWriter");
-		jclass printWriterClass = env->FindClass("java/io/PrintWriter");
-		jclass throwableClass = env->FindClass("java/lang/Throwable");
-		jobject stringWriter = env->NewObject(
-				stringWriterClass,
-				env->GetMethodID(stringWriterClass, "<init>", "()V"));
-
-		jobject printWriter = env->NewObject(
-				printWriterClass,
-				env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
-				stringWriter);
-
-		env->CallObjectMethod(lException,
-				env->GetMethodID(throwableClass, "printStackTrace",
-						"(Ljava/io/PrintWriter;)V"),
-				printWriter);
-
-		//env->CallObjectMethod(printWriter, env->GetMethodID(printWriterClass, "flush", "()V"));
-		jmethodID toStringMethod =
-			env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
-		jobject errorMessageObj = env->CallObjectMethod(
-				stringWriter, toStringMethod);
-		jstring errorMessage = (jstring) errorMessageObj;
-		const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
-		std::stringstream s;
-		s << "A Java Exception was thrown:" << std::endl << errMsg;
-		env->ReleaseStringUTFChars(errorMessage, errMsg);
-		std::string err("");
-		err += s.str();
-		env->ExceptionClear();
-    JdbcModule::throwError("JAVA-EXCEPTION", err);
+    JdbcModule::throwJavaException(env, lException);
 	}
   
 	return ItemSequence_t(new EmptySequence());
