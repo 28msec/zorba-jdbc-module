@@ -259,6 +259,44 @@ JdbcModule::getStringArg(const ExternalFunction::Arguments_t& args, int index) {
   return result;
 }
 
+Item
+JdbcModule::getItemArg(const ExternalFunction::Arguments_t& args, int index) {
+  Iterator_t lIter = args[index]->getIterator();
+	lIter->open();
+	Item item;
+	lIter->next(item);
+	lIter->close();
+  return item;
+}
+
+String
+JdbcModule::getUUID() {
+  uuid lUUID;
+  uuid::create(&lUUID);
+  std::stringstream lStream;
+  lStream << lUUID;
+  return lStream.str();
+}
+
+InstanceMap* 
+  JdbcModule::getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName) {
+  InstanceMap* result;
+  DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
+  if (!(result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName))))
+  {
+    result = new InstanceMap();
+    lDctx->addExternalFunctionParameter(mapName, result);
+  }
+  return result;
+}
+
+InstanceMap* 
+  JdbcModule::getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName) {
+  DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
+  InstanceMap* result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName));
+  return result;
+}
+
 
 }}; // namespace zorba, jdbc
 

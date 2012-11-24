@@ -16,7 +16,6 @@
 
 #include "disconnect.h"
 #include "jdbc.h"
-#include "instancemap.h"
 
 namespace zorba
 {
@@ -39,7 +38,7 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
     InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP_CONNECTIONS))))
+    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }

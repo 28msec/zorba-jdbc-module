@@ -16,7 +16,6 @@
 
 #include "connect.h"
 #include "jdbc.h"
-#include "instancemap.h"
 
 namespace zorba
 {
@@ -31,50 +30,39 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jclass cDriverManager;
-  jstring url, username, password;
-  uuid lUUID;
-  String lStrUUID;
-  
+  Item result;
   try
   {
+    jstring url, username, password;
 		// read input param 0
-    Iterator_t lIter = args[0]->getIterator();
-		lIter->open();
-		Item item;
-		std::vector<jstring> params;
+    Item item = JdbcModule::getItemArg(args, 0);
     bool hasUsername=false;
-		if (lIter->next(item))
-		{
-      if (item.isJSONItem()) 
-      {
-        Iterator_t lKeys = item.getObjectKeys();
+    if (item.isJSONItem()) 
+    {
+      Iterator_t lKeys = item.getObjectKeys();
         
-        lKeys->open();
-        Item lKey;
-        while (lKeys->next(lKey))
-        {
-          zorba::String keystring = lKey.getStringValue();
-          //std::cout << "Key: '" << keystring << "'" << std::endl; std::cout.flush();
-          if (keystring=="url") {
-            url =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
-          } else if (keystring=="user") {
-            username =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
-            hasUsername = true;
-          } else if (keystring=="password") {
-            password =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
-          } else if (keystring.compare("type")) {
-          } else if (keystring.compare("driver")) {
-          }
+      lKeys->open();
+      Item lKey;
+      while (lKeys->next(lKey))
+      {
+        zorba::String keystring = lKey.getStringValue();
+        if (keystring=="url") {
+          url =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+        } else if (keystring=="user") {
+          username =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+          hasUsername = true;
+        } else if (keystring=="password") {
+          password =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+        } else if (keystring.compare("type")) {
+        } else if (keystring.compare("driver")) {
         }
-        lKeys->close();
       }
-		}
+      lKeys->close();
+    }
 
-		lIter->close();
     jmethodID mConnection;
     jobject oConnection;
-    cDriverManager = env->FindClass("java/sql/DriverManager");
+    jclass cDriverManager = env->FindClass("java/sql/DriverManager");
     CHECK_EXCEPTION(env);
     if (hasUsername) {
       mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
@@ -87,22 +75,12 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, url);
       CHECK_EXCEPTION(env);
     }
-  
-    uuid::create(&lUUID);
-    std::stringstream lStream;
-    lStream << lUUID;
-    lStrUUID = lStream.str();
 
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP_CONNECTIONS))))
-    {
-      lInstanceMap = new InstanceMap();
-      lDctx->addExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP_CONNECTIONS, lInstanceMap);
-    }
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    String lStrUUID = JdbcModule::getUUID();
     lInstanceMap->storeInstance(lStrUUID, oConnection);
 
+    result = theFactory->createAnyURI(lStrUUID);
 	}
   catch (zorba::jvm::VMOpenException&)
 	{
@@ -113,7 +91,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
     JdbcModule::throwJavaException(env, lException);
 	}
   
-  return ItemSequence_t(new SingletonItemSequence(theFactory->createAnyURI(lStrUUID)));   
+  return ItemSequence_t(new SingletonItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc

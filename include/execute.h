@@ -18,6 +18,7 @@
 #include <zorba/external_module.h>
 #include <zorba/item_factory.h>
 #include <zorba/zorba.h>
+#include <zorba/singleton_item_sequence.h>
 
 #include "JavaVMSingleton.h"
 

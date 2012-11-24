@@ -17,12 +17,14 @@
 #include <zorba/zorba.h>
 #include <zorba/external_module.h>
 #include <zorba/util/uuid.h>
+#include "instancemap.h"
 
 #include "JavaVMSingleton.h"
 
 #define JDBC_MODULE_NAMESPACE "http://www.zorba-xquery.com/modules/jdbc"
-#define JDBC_MODULE_INSTANCE_MAP "jdbcInstanceMap"
-#define JDBC_MODULE_INSTANCE_MAP_CONNECTIONS "jdbcInstanceMapConnections"
+
+#define INSTANCE_MAP_CONNECTIONS "JdbcInstanceMapConnections"
+#define INSTANCE_MAP_STATEMENTS "JdbcInstanceMapStatements"
 
 class JavaException {};
 
@@ -69,7 +71,11 @@ class JdbcModule : public ExternalModule {
 
     static JNIEnv* getJavaEnv(const zorba::StaticContext* aStaticContext);
 
-    static String getStringArg(const ExternalFunction::Arguments_t& args, int index);
+    static String 
+      getStringArg(const ExternalFunction::Arguments_t& args, int index);
+
+    static Item 
+      getItemArg(const ExternalFunction::Arguments_t& args, int index);
 
     static void 
       throwJavaException(JNIEnv *env, jthrowable& lException);
@@ -77,6 +83,15 @@ class JdbcModule : public ExternalModule {
       throwError (const char *aLocalName, const char* aErrorMessage);
     static void
       throwError(const char *aLocalName, String aErrorMessage);
+
+    static String
+      getUUID();
+
+    static InstanceMap* 
+      getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
+    static InstanceMap* 
+      getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
+
 };
 
 

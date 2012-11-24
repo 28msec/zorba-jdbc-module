@@ -15,7 +15,6 @@
  */
 #include "affectedrows.h"
 #include "jdbc.h"
-#include "instancemap.h"
 
 namespace zorba
 {
@@ -78,10 +77,10 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
     DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
   
     InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP))))
+    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
     {
       lInstanceMap = new InstanceMap();
-      lDctx->addExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP, lInstanceMap);
+      lDctx->addExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS, lInstanceMap);
     }
     lInstanceMap->storeInstance(lStrUUID, oConnection);
 

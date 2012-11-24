@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#pragma once
+#ifndef INSTANCE_MAP
+#define INSTANCE_MAP
 
 #include <map>
 #include <string>
@@ -49,3 +52,4 @@ class InstanceMap : public ExternalFunctionParameter
 
 }}; // namespace zorba, jdbc
 
+#endif

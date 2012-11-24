@@ -16,7 +16,6 @@
 
 #include "connectionoptions.h"
 #include "jdbc.h"
-#include "instancemap.h"
 
 namespace zorba
 {
@@ -44,16 +43,17 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 		// Local variables
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP_CONNECTIONS))))
+    InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    if (lInstanceMap = NULL)
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
-    if(!(oConnection = lInstanceMap->getInstance(lStrUUID)))
+    jobject oConnection = lInstanceMap->getInstance(lStrUUID);
+    if(oConnection==NULL)
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
+
     std::vector<std::pair<Item, Item>> resultVector;
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);

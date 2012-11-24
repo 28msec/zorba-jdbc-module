@@ -16,7 +16,6 @@
 
 #include "execute.h"
 #include "jdbc.h"
-#include "instancemap.h"
 
 namespace zorba
 {
@@ -31,32 +30,39 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jobject oConnection;
+  Item result;
 	try
   {
 		// Local variables
-    String lStrUUID = JdbcModule::getStringArg(args, 0);
+    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
 
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(JDBC_MODULE_INSTANCE_MAP_CONNECTIONS))))
+
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    if (lInstanceMap==NULL)
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
-    if(!(oConnection = lInstanceMap->getInstance(lStrUUID)))
+    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
+    if(oConnection==NULL)
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
+
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
     jobject statement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
     CHECK_EXCEPTION(env);
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
-    jboolean executed = env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
+    env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
     CHECK_EXCEPTION(env);
 
+    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
+    String resultUUID = JdbcModule::getUUID();
+    lInstanceMap->storeInstance(resultUUID, oConnection);
+
+    result = theFactory->createAnyURI(resultUUID);
 
 	}
   catch (zorba::jvm::VMOpenException&)
@@ -68,7 +74,7 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
     JdbcModule::throwJavaException(env, lException);
 	}
   
-	return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new SingletonItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc
