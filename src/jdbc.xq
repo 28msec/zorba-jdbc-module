@@ -23,11 +23,11 @@ declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare namespace an = "http://www.zorba-xquery.com/annotations";
 declare option ver:module-version "1.0";
 
-declare $jsql:NOT-SUPPORTED    := "NOT-SUPPORTED";
-declare $jsql:READ-COMMITTED   := "READ-COMMITTED";
-declare $jsql:READ-UNCOMMITTED := "READ-UNCOMMITTED";
-declare $jsql:REPEATABLE-READ  := "REPEATABLE-READ";
-declare $jsql:SERIALIZABLE     := "SERIALIZABLE";
+declare variable $jdbc:NOT-SUPPORTED    := "NOT-SUPPORTED";
+declare variable $jdbc:READ-COMMITTED   := "READ-COMMITTED";
+declare variable $jdbc:READ-UNCOMMITTED := "READ-UNCOMMITTED";
+declare variable $jdbc:REPEATABLE-READ  := "REPEATABLE-READ";
+declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
 
 (:
  :  2 CONNECTION HANDLING
@@ -122,7 +122,19 @@ declare %an:sequential function jdbc:prepare-statement(
  :)
 declare %an:sequential function jdbc:set-numeric(
                                      $prepared-statement as xs:anyURI, 
-                                     $parameter-index as xs:integer, 
+                                     $parameter-index as xs:decimal, 
+                                     $value as xs:anyAtomicType) external;
+declare %an:sequential function jdbc:set-numeric(
+                                     $prepared-statement as xs:anyURI, 
+                                     $parameter-index as xs:float, 
+                                     $value as xs:anyAtomicType) external;
+declare %an:sequential function jdbc:set-numeric(
+                                     $prepared-statement as xs:anyURI, 
+                                     $parameter-index as xs:double, 
+                                     $value as xs:anyAtomicType) external;
+declare %an:sequential function jdbc:set-numeric(
+                                     $prepared-statement as xs:anyURI, 
+                                     $parameter-index as xs:decimal, 
                                      $value as xs:anyAtomicType) external;
 (:
  :  5.2.2 Set the value of the designated parameter with the given value.

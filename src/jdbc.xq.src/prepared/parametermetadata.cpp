@@ -16,6 +16,7 @@
 
 #include "parametermetadata.h"
 #include "jdbc.h"
+#include <zorba/singleton_item_sequence.h>
 
 namespace zorba
 {
@@ -30,60 +31,64 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  
+  Item result;
 	try
   {
-    CHECK_EXCEPTION(env);
+		// Local variables
+    String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-		// read input param 0
-    Iterator_t lIter = args[0]->getIterator();
-		lIter->open();
-		Item item;
-		std::vector<jstring> params;
-    bool hasUsername=false;
-		if (lIter->next(item))
-		{
-      if (item.isJSONItem()) 
-      {
-        Iterator_t lKeys = item.getObjectKeys();
-        
-        lKeys->open();
-        Item lKey;
-        while (lKeys->next(lKey))
-        {
-          zorba::String keystring = lKey.getStringValue();
-          std::cout << "Key: '" << keystring << "'" << std::endl; std::cout.flush();
-          if (keystring=="") {
-          }
-        }
-        lKeys->close();
-      }
-		}
-
-		lIter->close();
-    jclass cDriverManager = env->FindClass("java/sql/DriverManager");
-    CHECK_EXCEPTION(env);
-    jmethodID mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
-    CHECK_EXCEPTION(env);
-    jobject oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, "", "", "");
-    CHECK_EXCEPTION(env);
-
-    uuid lUUID;
-    String lStrUUID;  
-    uuid::create(&lUUID);
-    std::stringstream lStream;
-    lStream << lUUID;
-    lStrUUID = lStream.str();
-
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
+    if (lInstanceMap==NULL)
     {
-      lInstanceMap = new InstanceMap();
-      lDctx->addExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS, lInstanceMap);
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
-    lInstanceMap->storeInstance(lStrUUID, oConnection);
+    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
+    if(oPreparedStatement==NULL)
+    {
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+    }
+
+    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
+    CHECK_EXCEPTION(env);
+
+    jobject oParameterMetaData = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;"));
+    CHECK_EXCEPTION(env);
+
+    jclass cParameterMetaData = env->FindClass("java/sql/ParameterMetaData");
+    CHECK_EXCEPTION(env);
+
+    int columns = env->CallIntMethod(oParameterMetaData, env->GetMethodID(cParameterMetaData, "getParameterCount", "()I"));
+    CHECK_EXCEPTION(env);
+
+    zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
+    jmethodID mParameterType = env->GetMethodID(cParameterMetaData, "getParameterTypeName",  "(I)Ljava/lang/String;");
+    jmethodID mParameterName = env->GetMethodID(cParameterMetaData, "getParameterClassName", "(I)Ljava/lang/String;");
+    std::vector<zorba::Item> elements;
+
+    for (int i=1; i<=columns; i++) {
+        std::vector<std::pair<zorba::Item, zorba::Item>> column;
+
+        jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterName, i);
+        CHECK_EXCEPTION(env);
+        String sName = env->GetStringUTFChars(oName, NULL);
+        CHECK_EXCEPTION(env);
+        zorba::Item iName = itemFactory->createString(sName);
+        std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
+        column.push_back(pName);
+
+        jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterName, i);
+        CHECK_EXCEPTION(env);
+        String  sType = env->GetStringUTFChars(oName, NULL);
+        CHECK_EXCEPTION(env); 
+        zorba::Item iType = itemFactory->createString(sName);
+        std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
+        column.push_back(pType);
+        elements.push_back(itemFactory->createJSONObject(column));
+    }
+    std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createJSONArray(elements));
+    std::vector<std::pair<zorba::Item, zorba::Item>> vResult;
+    vResult.push_back(allColumns);
+    result = itemFactory->createJSONObject(vResult);
 
 	}
   catch (zorba::jvm::VMOpenException&)
@@ -95,7 +100,7 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
     JdbcModule::throwJavaException(env, lException);
 	}
   
-	return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new SingletonItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc

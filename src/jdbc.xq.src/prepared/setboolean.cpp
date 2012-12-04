@@ -30,60 +30,35 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  
+  Item result;
 	try
   {
-    CHECK_EXCEPTION(env);
+		// Local variables
+    String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-		// read input param 0
-    Iterator_t lIter = args[0]->getIterator();
-		lIter->open();
-		Item item;
-		std::vector<jstring> params;
-    bool hasUsername=false;
-		if (lIter->next(item))
-		{
-      if (item.isJSONItem()) 
-      {
-        Iterator_t lKeys = item.getObjectKeys();
-        
-        lKeys->open();
-        Item lKey;
-        while (lKeys->next(lKey))
-        {
-          zorba::String keystring = lKey.getStringValue();
-          std::cout << "Key: '" << keystring << "'" << std::endl; std::cout.flush();
-          if (keystring=="") {
-          }
-        }
-        lKeys->close();
-      }
-		}
-
-		lIter->close();
-    jclass cDriverManager = env->FindClass("java/sql/DriverManager");
-    CHECK_EXCEPTION(env);
-    jmethodID mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
-    CHECK_EXCEPTION(env);
-    jobject oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, "", "", "");
-    CHECK_EXCEPTION(env);
-
-    uuid lUUID;
-    String lStrUUID;  
-    uuid::create(&lUUID);
-    std::stringstream lStream;
-    lStream << lUUID;
-    lStrUUID = lStream.str();
-
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
+    if (lInstanceMap==NULL)
     {
-      lInstanceMap = new InstanceMap();
-      lDctx->addExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS, lInstanceMap);
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
-    lInstanceMap->storeInstance(lStrUUID, oConnection);
+    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
+    if(oPreparedStatement==NULL)
+    {
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+    }
+
+    int index = JdbcModule::getItemArg(args, 1).getIntValue();
+    Item value = JdbcModule::getItemArg(args, 2);
+    int type = value.getTypeCode();
+
+    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
+    CHECK_EXCEPTION(env);
+    if (type == zorba::store::SchemaTypeCode::XS_BOOLEAN) {
+      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setBoolean", "(IZ)V"), index, value.getBooleanValue());
+    } else {
+      JdbcModule::throwError("SQL004", "Error setting boolean value.");
+    }
+    CHECK_EXCEPTION(env);
 
 	}
   catch (zorba::jvm::VMOpenException&)

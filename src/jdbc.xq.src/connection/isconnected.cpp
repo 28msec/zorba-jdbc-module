@@ -30,7 +30,6 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jobject oConnection;
   jboolean isClosed;
 	try
   {

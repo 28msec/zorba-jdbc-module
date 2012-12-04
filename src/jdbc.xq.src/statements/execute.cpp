@@ -16,6 +16,7 @@
 
 #include "execute.h"
 #include "jdbc.h"
+#include <zorba/singleton_item_sequence.h>
 
 namespace zorba
 {
@@ -51,16 +52,16 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
-    jobject statement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
+    jobject oStatement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
     CHECK_EXCEPTION(env);
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
-    env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
+    env->CallBooleanMethod(oStatement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
     CHECK_EXCEPTION(env);
 
     lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
     String resultUUID = JdbcModule::getUUID();
-    lInstanceMap->storeInstance(resultUUID, oConnection);
+    lInstanceMap->storeInstance(resultUUID, oStatement);
 
     result = theFactory->createAnyURI(resultUUID);
 

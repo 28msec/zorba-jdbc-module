@@ -30,7 +30,6 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jobject oConnection;
   static bool isolationLevelsLoaded = false;
   static int TRANSACTION_NONE;
   static int TRANSACTION_READ_UNCOMMITTED;
@@ -65,15 +64,15 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
 
     if (!isolationLevelsLoaded) {
-      TRANSACTION_NONE             = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "TRANSACTION_NONE", "I"));
+      TRANSACTION_NONE = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_NONE", "I"));
       CHECK_EXCEPTION(env);
-      TRANSACTION_READ_UNCOMMITTED = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "TRANSACTION_READ_UNCOMMITTED", "I"));
+      TRANSACTION_READ_UNCOMMITTED = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_READ_UNCOMMITTED", "I"));
       CHECK_EXCEPTION(env);
-      TRANSACTION_READ_COMMITTED   = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "TRANSACTION_READ_COMMITTED", "I"));
+      TRANSACTION_READ_COMMITTED = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_READ_COMMITTED", "I"));
       CHECK_EXCEPTION(env);
-      TRANSACTION_REPEATABLE_READ  = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "TRANSACTION_REPEATABLE_READ", "I"));
+      TRANSACTION_REPEATABLE_READ = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_REPEATABLE_READ", "I"));
       CHECK_EXCEPTION(env);
-      TRANSACTION_SERIALIZABLE     = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "TRANSACTION_SERIALIZABLE", "I"));
+      TRANSACTION_SERIALIZABLE = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_SERIALIZABLE", "I"));
       CHECK_EXCEPTION(env);
       isolationLevelsLoaded=true;
     }

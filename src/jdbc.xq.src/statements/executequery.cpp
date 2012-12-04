@@ -16,6 +16,7 @@
 
 #include "executequery.h"
 #include "jdbc.h"
+#include "jsonitemsequence.h"
 
 namespace zorba
 {
@@ -30,60 +31,33 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
 {
 	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  
+  jobject result;
 	try
   {
-    CHECK_EXCEPTION(env);
+		// Local variables
+    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
+    String lQuery = JdbcModule::getStringArg(args, 1);
 
-		// read input param 0
-    Iterator_t lIter = args[0]->getIterator();
-		lIter->open();
-		Item item;
-		std::vector<jstring> params;
-    bool hasUsername=false;
-		if (lIter->next(item))
-		{
-      if (item.isJSONItem()) 
-      {
-        Iterator_t lKeys = item.getObjectKeys();
-        
-        lKeys->open();
-        Item lKey;
-        while (lKeys->next(lKey))
-        {
-          zorba::String keystring = lKey.getStringValue();
-          std::cout << "Key: '" << keystring << "'" << std::endl; std::cout.flush();
-          if (keystring=="") {
-          }
-        }
-        lKeys->close();
-      }
-		}
 
-		lIter->close();
-    jclass cDriverManager = env->FindClass("java/sql/DriverManager");
-    CHECK_EXCEPTION(env);
-    jmethodID mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
-    CHECK_EXCEPTION(env);
-    jobject oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, "", "", "");
-    CHECK_EXCEPTION(env);
-
-    uuid lUUID;
-    String lStrUUID;  
-    uuid::create(&lUUID);
-    std::stringstream lStream;
-    lStream << lUUID;
-    lStrUUID = lStream.str();
-
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    if (lInstanceMap==NULL)
     {
-      lInstanceMap = new InstanceMap();
-      lDctx->addExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS, lInstanceMap);
+      JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
-    lInstanceMap->storeInstance(lStrUUID, oConnection);
+    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
+    if(oConnection==NULL)
+    {
+      JdbcModule::throwError("SQL08003", "Connection does not exist.");
+    }
+
+    jclass cConnection = env->FindClass("java/sql/Connection");
+    CHECK_EXCEPTION(env);
+    jobject oStatement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
+    CHECK_EXCEPTION(env);
+    jclass cStatement = env->FindClass("java/sql/Statement");
+    CHECK_EXCEPTION(env);
+    result = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;"), lQuery);
+    CHECK_EXCEPTION(env);
 
 	}
   catch (zorba::jvm::VMOpenException&)
@@ -95,7 +69,7 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
     JdbcModule::throwJavaException(env, lException);
 	}
   
-	return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new JSONItemSequence(result, env));
 }
 
 }}; // namespace zorba, jdbc
