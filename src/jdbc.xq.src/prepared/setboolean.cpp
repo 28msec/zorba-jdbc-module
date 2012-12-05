@@ -28,12 +28,10 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-	try
-  {
-		// Local variables
+
+  JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
@@ -60,15 +58,7 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
     }
     CHECK_EXCEPTION(env);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
 	return ItemSequence_t(new EmptySequence());
 }

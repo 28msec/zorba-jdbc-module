@@ -16,6 +16,7 @@
 
 #include "executeupdateprepared.h"
 #include "jdbc.h"
+#include <zorba/singleton_item_sequence.h>
 
 namespace zorba
 {
@@ -28,12 +29,10 @@ ExecuteUpdatePreparedFunction::evaluate(const ExternalFunction::Arguments_t& arg
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-	try
-  {
-		// Local variables
+
+  JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
@@ -50,31 +49,13 @@ ExecuteUpdatePreparedFunction::evaluate(const ExternalFunction::Arguments_t& arg
     jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
 
-    jobject oParameterMetadata = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;"));
+    int rowCount = env->CallIntMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "executeUpdate", "()I"));
     CHECK_EXCEPTION(env);
 
-    jclass cParameterMetaData = env->FindClass("java/sql/ParameterMetaData");
-    CHECK_EXCEPTION(env);
-
-    int index = JdbcModule::getItemArg(args, 1).getIntValue();
-    
-    int parameterType = env->CallIntMethod(oParameterMetadata, env->GetMethodID(cParameterMetaData, "getParameterType", "(I)I"), index);
-    CHECK_EXCEPTION(env);
-
-    env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setNull", "(II)V"), index, parameterType);
-    CHECK_EXCEPTION(env);
-
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+    result = theFactory->createInteger(rowCount);
+  JDBC_MODULE_CATCH
   
-	return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new SingletonItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc

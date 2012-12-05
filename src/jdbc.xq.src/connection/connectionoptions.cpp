@@ -28,7 +28,6 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   static bool isolationLevelsLoaded = false;
   static int TRANSACTION_NONE;
@@ -37,9 +36,8 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
   static int TRANSACTION_REPEATABLE_READ;
   static int TRANSACTION_SERIALIZABLE;
   Item result;
-  try
-  {
-		// Local variables
+
+  JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);

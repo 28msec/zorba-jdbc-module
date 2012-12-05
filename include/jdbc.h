@@ -30,6 +30,13 @@
 class JavaException {};
 
 #define CHECK_EXCEPTION(env)  if ((lException = env->ExceptionOccurred())) throw JavaException()
+#define JDBC_MODULE_TRY  jthrowable lException = 0;	try   {
+#define JDBC_MODULE_CATCH 	}  catch (zorba::jvm::VMOpenException&)	{ \
+                              JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?)."); \
+	                          }  catch (JavaException&)	{ \
+                               JdbcModule::throwJavaException(env, lException); \
+                          	}
+
 
 
 namespace zorba

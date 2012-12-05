@@ -29,47 +29,37 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-	try
-  {
+  
+  JDBC_MODULE_TRY
 		// Local variables
-    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
-    String lQuery = JdbcModule::getStringArg(args, 1);
+    String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     if (lInstanceMap==NULL)
     {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
-    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
-    if(oConnection==NULL)
+    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
+    if(oPreparedStatement==NULL)
     {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
-    jobject oPrepStatement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;"), lQuery);
+    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
 
-    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
+    env->CallBooleanMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "execute", "()Z"));
+    CHECK_EXCEPTION(env);
+
+    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
     String resultUUID = JdbcModule::getUUID();
-    lInstanceMap->storeInstance(resultUUID, oPrepStatement);
+    lInstanceMap->storeInstance(resultUUID, oPreparedStatement);
 
     result = theFactory->createAnyURI(resultUUID);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(result));
 }

@@ -28,13 +28,12 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
+
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-  try
-  {
+  
+  JDBC_MODULE_TRY
     jstring url, username, password;
-		// read input param 0
     Item item = JdbcModule::getItemArg(args, 0);
     bool hasUsername=false;
     if (item.isJSONItem()) 
@@ -81,15 +80,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
     lInstanceMap->storeInstance(lStrUUID, oConnection);
 
     result = theFactory->createAnyURI(lStrUUID);
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(result));
 }

@@ -28,13 +28,10 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   jboolean isClosed;
-	try
-  {
 
-		// Local variables
+  JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
@@ -54,15 +51,7 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
     isClosed = env->CallBooleanMethod(oConnection, mIsClosed);
     CHECK_EXCEPTION(env);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(theFactory->createBoolean(isClosed==JNI_TRUE)));
 }

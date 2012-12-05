@@ -29,14 +29,11 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-	try
-  {
-		// Local variables
-    String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
+  JDBC_MODULE_TRY
+    String lStatementUUID = JdbcModule::getStringArg(args, 0);
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     if (lInstanceMap==NULL)
     {
@@ -76,7 +73,7 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
         std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
         column.push_back(pName);
 
-        jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterName, i);
+        jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterType, i);
         CHECK_EXCEPTION(env);
         String  sType = env->GetStringUTFChars(oName, NULL);
         CHECK_EXCEPTION(env); 
@@ -90,15 +87,7 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
     vResult.push_back(allColumns);
     result = itemFactory->createJSONObject(vResult);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(result));
 }

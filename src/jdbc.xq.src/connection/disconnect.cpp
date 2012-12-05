@@ -28,12 +28,10 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   jobject oConnection;
-  try
-  {
-		// Local variables
+
+  JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
@@ -63,15 +61,7 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       JdbcModule::throwError("SQL08008", "Connection already closed.");
     }
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
 	return ItemSequence_t(new EmptySequence());
 }

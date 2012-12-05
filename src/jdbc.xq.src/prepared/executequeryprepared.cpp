@@ -16,6 +16,7 @@
 
 #include "executequeryprepared.h"
 #include "jdbc.h"
+#include "jsonitemsequence.h"
 
 namespace zorba
 {
@@ -28,48 +29,32 @@ ExecuteQueryPreparedFunction::evaluate(const ExternalFunction::Arguments_t& args
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  Item result;
-	try
-  {
-		// Local variables
-    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
-    String lQuery = JdbcModule::getStringArg(args, 1);
+  jobject result;
 
+  JDBC_MODULE_TRY
+    String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     if (lInstanceMap==NULL)
     {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
-    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
-    if(oConnection==NULL)
+    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
+    if(oPreparedStatement==NULL)
     {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
-    jobject statement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
-    CHECK_EXCEPTION(env);
-    jclass cStatement = env->FindClass("java/sql/Statement");
-    CHECK_EXCEPTION(env);
-    jboolean queryResult = env->CallBooleanMethod(statement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
+    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
 
+    result = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "executeQuery", "()Ljava/sql/ResultSet;"));
+    CHECK_EXCEPTION(env);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
-  return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new JSONItemSequence(result, env));
 }
 
 }}; // namespace zorba, jdbc

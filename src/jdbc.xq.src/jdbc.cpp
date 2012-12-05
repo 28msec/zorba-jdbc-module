@@ -227,8 +227,8 @@ JNIEnv*
 JdbcModule::getJavaEnv(const zorba::StaticContext* aStaticContext) {
   static JNIEnv* env;
   if (env==NULL) {
-  	jthrowable lException = 0;
-    try {
+    JNIEnv *env;
+    JDBC_MODULE_TRY
         env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
         CHECK_EXCEPTION(env);
     }

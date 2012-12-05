@@ -29,12 +29,10 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-	jthrowable lException = 0;
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   jobject result;
-	try
-  {
-		// Local variables
+
+  JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
 
@@ -59,15 +57,7 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
     result = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;"), lQuery);
     CHECK_EXCEPTION(env);
 
-	}
-  catch (zorba::jvm::VMOpenException&)
-	{
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
-    JdbcModule::throwJavaException(env, lException);
-	}
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new JSONItemSequence(result, env));
 }
