@@ -96,7 +96,7 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
       std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createJSONArray(elements));
       vResult.push_back(allColumns);
     } else { // UPDATE QUERY
-      std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createInteger(rowsAffected));
+      std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("affectedrows"), itemFactory->createInteger(rowsAffected));
       vResult.push_back(allColumns);
     }
     result = itemFactory->createJSONObject(vResult);
