@@ -124,18 +124,6 @@ declare %an:sequential function jdbc:set-numeric(
                                      $prepared-statement as xs:anyURI, 
                                      $parameter-index as xs:decimal, 
                                      $value as xs:anyAtomicType) external;
-declare %an:sequential function jdbc:set-numeric(
-                                     $prepared-statement as xs:anyURI, 
-                                     $parameter-index as xs:float, 
-                                     $value as xs:anyAtomicType) external;
-declare %an:sequential function jdbc:set-numeric(
-                                     $prepared-statement as xs:anyURI, 
-                                     $parameter-index as xs:double, 
-                                     $value as xs:anyAtomicType) external;
-declare %an:sequential function jdbc:set-numeric(
-                                     $prepared-statement as xs:anyURI, 
-                                     $parameter-index as xs:decimal, 
-                                     $value as xs:anyAtomicType) external;
 (:
  :  5.2.2 Set the value of the designated parameter with the given value.
  :)

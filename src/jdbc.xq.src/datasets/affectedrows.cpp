@@ -69,7 +69,7 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
         rowsAffected=0;
       }
     }
-    std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createInteger(rowsAffected));
+    std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("affectedrows"), itemFactory->createInteger(rowsAffected));
     vResult.push_back(allColumns);
     result = itemFactory->createJSONObject(vResult);
   JDBC_MODULE_CATCH

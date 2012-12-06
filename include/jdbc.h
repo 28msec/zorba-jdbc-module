@@ -37,7 +37,12 @@ class JavaException {};
                                JdbcModule::throwJavaException(env, lException); \
                           	}
 
-
+#define LOG_ACTIVE
+#ifdef LOG_ACTIVE
+#define LOG(message) std::cout << message << std::endl; std::cout.flush();
+#else
+#define LOG(message) // No logging activated
+#endif
 
 namespace zorba
 {

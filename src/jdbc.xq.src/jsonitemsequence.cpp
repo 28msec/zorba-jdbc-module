@@ -52,7 +52,7 @@ namespace jdbc
         CHECK_EXCEPTION(env);
         columnNames[i] = env->GetStringUTFChars(oName, NULL);
         CHECK_EXCEPTION(env);
-        std::cout << "Getting column ["<< i << "] with name: " << columnNames[i] << std::endl; /// DEBUG
+        LOG("Getting column ["<< i << "] with name: " << columnNames[i])
         columnTypes[i] = env->CallIntMethod(oMetadata, mColumnType, i);
         CHECK_EXCEPTION(env);
       }

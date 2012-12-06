@@ -30,14 +30,14 @@ ExecuteUpdateFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
-
+    
+    LOG("Execute update with Query: " << lQuery)
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
     if (lInstanceMap==NULL)
@@ -56,7 +56,8 @@ ExecuteUpdateFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
-    int executionResult = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "executeUpdate", "(Ljava/lang/String;)I"), lQuery);
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    int executionResult = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "executeUpdate", "(Ljava/lang/String;)I"), query );
     CHECK_EXCEPTION(env);
     result = theFactory->createInt(executionResult);
 

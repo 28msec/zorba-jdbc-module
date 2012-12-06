@@ -28,10 +28,9 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
-  
+  LOG("Getting connection")
   JDBC_MODULE_TRY
     jstring url, username, password;
     Item item = JdbcModule::getItemArg(args, 0);
@@ -39,19 +38,26 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
     if (item.isJSONItem()) 
     {
       Iterator_t lKeys = item.getObjectKeys();
-        
       lKeys->open();
       Item lKey;
       while (lKeys->next(lKey))
       {
         zorba::String keystring = lKey.getStringValue();
+        zorba::String value = item.getObjectValue(keystring).getStringValue();
+        LOG("Parsing JSON param: " << keystring)
         if (keystring=="url") {
-          url =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+          url =  env->NewStringUTF(value.c_str());
+          LOG("url: " << value)
+          CHECK_EXCEPTION(env);
         } else if (keystring=="user") {
-          username =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+          username =  env->NewStringUTF(value.c_str());
+          CHECK_EXCEPTION(env);
+          LOG("username: '" << value << "'")
           hasUsername = true;
         } else if (keystring=="password") {
-          password =  env->NewStringUTF(item.getObjectValue(keystring).getStringValue().c_str());
+          password =  env->NewStringUTF(value.c_str());
+          LOG("password: '" << value << "'")
+          CHECK_EXCEPTION(env);
         } else if (keystring.compare("type")) {
         } else if (keystring.compare("driver")) {
         }
@@ -59,11 +65,14 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       lKeys->close();
     }
 
+    LOG("Starting Driver Manager")
     jmethodID mConnection;
     jobject oConnection;
     jclass cDriverManager = env->FindClass("java/sql/DriverManager");
+    LOG("B")
     CHECK_EXCEPTION(env);
     if (hasUsername) {
+      LOG("Has username")
       mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
       CHECK_EXCEPTION(env);
       oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, url, username, password);
@@ -81,7 +90,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     result = theFactory->createAnyURI(lStrUUID);
   JDBC_MODULE_CATCH
-  
+  LOG("Returning Env")
   return ItemSequence_t(new SingletonItemSequence(result));
 }
 

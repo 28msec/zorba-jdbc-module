@@ -226,21 +226,12 @@ JdbcModule::throwJavaException(JNIEnv *env, jthrowable& lException)
 JNIEnv* 
 JdbcModule::getJavaEnv(const zorba::StaticContext* aStaticContext) {
   static JNIEnv* env;
+  LOG("Getting ENV")
   if (env==NULL) {
-    JNIEnv *env;
     JDBC_MODULE_TRY
         env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
         CHECK_EXCEPTION(env);
-    }
-    catch (zorba::jvm::VMOpenException&)
-	  {
-      JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	  }
-	  catch (JavaException&)
-	  {
-      JdbcModule::throwJavaException(env, lException);
-	  }
-
+    JDBC_MODULE_CATCH
   }
   return env;
 }

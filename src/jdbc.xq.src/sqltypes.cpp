@@ -64,7 +64,7 @@ void SQLTypes::init(JNIEnv* env) {
   if (TypesLoaded) 
     return;
   TypesLoaded = true;
-  std::cout << "Initializing SQL Types" << std::endl;
+  LOG("Initializing SQL Types")
   jclass cTypes = env->FindClass("java/sql/Types");
   ARRAY = env->GetStaticIntField(cTypes, env->GetStaticFieldID(cTypes, "ARRAY", "I"));
   BIGINT = env->GetStaticIntField(cTypes, env->GetStaticFieldID(cTypes, "BIGINT", "I"));
