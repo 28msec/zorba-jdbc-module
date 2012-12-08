@@ -44,14 +44,12 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
       JdbcModule::throwError("SQL003", "Statement does not exist.");
     }
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
-
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
 
     int rowsAffected = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "getUpdateCount", "()I"));
     CHECK_EXCEPTION(env);
 
-    std::vector<std::pair<zorba::Item, zorba::Item>> vResult;
     if (rowsAffected==-1) { // NON UPDATE QUERY
       jobject oResultSet = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;"));
       CHECK_EXCEPTION(env);
@@ -69,9 +67,7 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
         rowsAffected=0;
       }
     }
-    std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("affectedrows"), itemFactory->createInteger(rowsAffected));
-    vResult.push_back(allColumns);
-    result = itemFactory->createJSONObject(vResult);
+    result = itemFactory->createInteger(rowsAffected);
   JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(result));

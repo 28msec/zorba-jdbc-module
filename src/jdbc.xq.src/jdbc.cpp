@@ -226,7 +226,6 @@ JdbcModule::throwJavaException(JNIEnv *env, jthrowable& lException)
 JNIEnv* 
 JdbcModule::getJavaEnv(const zorba::StaticContext* aStaticContext) {
   static JNIEnv* env;
-  LOG("Getting ENV")
   if (env==NULL) {
     JDBC_MODULE_TRY
         env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
@@ -271,6 +270,7 @@ JdbcModule::getUUID() {
 
 InstanceMap* 
   JdbcModule::getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName) {
+
   InstanceMap* result;
   DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
   if (!(result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName))))
@@ -283,8 +283,9 @@ InstanceMap*
 
 InstanceMap* 
   JdbcModule::getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName) {
+  InstanceMap* result;
   DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  InstanceMap* result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName));
+  result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName));
   return result;
 }
 

@@ -45,7 +45,7 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
       JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
 
-    int index = JdbcModule::getItemArg(args, 1).getIntValue();
+    int index = JdbcModule::getItemArg(args, 1).getLongValue();
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
@@ -60,10 +60,12 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
         env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setFloat", "(IF)V"), index, value.getDoubleValue());
       break;
       case zorba::store::SchemaTypeCode::XS_INTEGER:
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setLong", "(IJ)V"), index, value.getIntValue());
+        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setLong", "(IJ)V"), index, value.getLongValue());
       break;
       case zorba::store::SchemaTypeCode::XS_DECIMAL:
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index, value.getDoubleValue());
+        double dVal;
+        sscanf(value.getStringValue().c_str(), "%lf", &dVal);
+        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index,  dVal);
       break;
       default:
         JdbcModule::throwError("SQL004", "Error setting numeric value.");

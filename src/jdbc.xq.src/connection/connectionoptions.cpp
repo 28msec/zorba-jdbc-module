@@ -39,9 +39,8 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
   JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
-
     InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
-    if (lInstanceMap = NULL)
+    if (lInstanceMap==NULL)
     {
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }

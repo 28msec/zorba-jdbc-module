@@ -35,8 +35,6 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
-
-
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
     if (lInstanceMap==NULL)
     {
@@ -54,7 +52,8 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
-    env->CallBooleanMethod(oStatement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), lQuery);
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    env->CallBooleanMethod(oStatement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), query);
     CHECK_EXCEPTION(env);
 
     lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);

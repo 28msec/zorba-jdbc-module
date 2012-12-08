@@ -36,7 +36,7 @@ namespace jdbc
           jclass cResultSet;
           jobject oResultSet;
           JNIEnv* env;
-          std::string* columnNames;
+          String* columnNames;
           long* columnTypes;
           long columnCount;
           zorba::ItemFactory* itemFactory;

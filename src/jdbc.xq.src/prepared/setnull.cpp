@@ -53,8 +53,7 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
     jclass cParameterMetaData = env->FindClass("java/sql/ParameterMetaData");
     CHECK_EXCEPTION(env);
 
-    int index = JdbcModule::getItemArg(args, 1).getIntValue();
-    
+    int index = JdbcModule::getItemArg(args, 1).getLongValue();
     int parameterType = env->CallIntMethod(oParameterMetadata, env->GetMethodID(cParameterMetaData, "getParameterType", "(I)I"), index);
     CHECK_EXCEPTION(env);
 

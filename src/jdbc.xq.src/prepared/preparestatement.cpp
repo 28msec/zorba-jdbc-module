@@ -33,29 +33,28 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
   Item result;
   
   JDBC_MODULE_TRY
-		// Local variables
-    String lStatementUUID = JdbcModule::getStringArg(args, 0);
-
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
+    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
+    String lQuery = JdbcModule::getStringArg(args, 1);
+    InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
     if (lInstanceMap==NULL)
     {
-      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
-    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
-    if(oPreparedStatement==NULL)
+    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
+    if(oConnection==NULL)
     {
-      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
 
-    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
+    jclass cConnection = env->FindClass("java/sql/Connection");
+    CHECK_EXCEPTION(env);
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    jobject oPrepared = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;"), query);
     CHECK_EXCEPTION(env);
 
-    env->CallBooleanMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "execute", "()Z"));
-    CHECK_EXCEPTION(env);
-
-    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
+    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     String resultUUID = JdbcModule::getUUID();
-    lInstanceMap->storeInstance(resultUUID, oPreparedStatement);
+    lInstanceMap->storeInstance(resultUUID, oPrepared);
 
     result = theFactory->createAnyURI(resultUUID);
 

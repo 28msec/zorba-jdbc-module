@@ -37,8 +37,6 @@ ExecuteUpdateFunction::evaluate(const ExternalFunction::Arguments_t& args,
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
     
-    LOG("Execute update with Query: " << lQuery)
-
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
     if (lInstanceMap==NULL)
     {

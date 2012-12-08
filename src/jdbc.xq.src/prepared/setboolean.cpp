@@ -45,14 +45,17 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
       JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
 
-    int index = JdbcModule::getItemArg(args, 1).getIntValue();
+    int index = JdbcModule::getItemArg(args, 1).getLongValue();
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
     jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
     if (type == zorba::store::SchemaTypeCode::XS_BOOLEAN) {
-      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setBoolean", "(IZ)V"), index, value.getBooleanValue());
+      jboolean val = JNI_FALSE;
+      if (value.getBooleanValue())
+        val = JNI_TRUE;
+      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setBoolean", "(IZ)V"), index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting boolean value.");
     }

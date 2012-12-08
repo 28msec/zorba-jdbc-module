@@ -45,14 +45,15 @@ ItemSequence_t
       JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
     }
 
-    int index = JdbcModule::getItemArg(args, 1).getIntValue();
+    int index = JdbcModule::getItemArg(args, 1).getLongValue();
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
     jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
     if (type == zorba::store::SchemaTypeCode::XS_STRING) {
-      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setString", "(ILjava/lang/String;)V"), index, value.getStringValue());
+      jstring val =  env->NewStringUTF(value.getStringValue().c_str());
+      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setString", "(ILjava/lang/String;)V"), index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting string value.");
     }

@@ -26,6 +26,7 @@
 #define INSTANCE_MAP_CONNECTIONS "JdbcInstanceMapConnections"
 #define INSTANCE_MAP_STATEMENTS "JdbcInstanceMapStatements"
 #define INSTANCE_MAP_PREPAREDSTATEMENTS "JdbcInstanceMapPreparedStatements"
+#define INSTANCE_MAP_RECORDSETS "JdbcInstanceMapRecordSets"
 
 class JavaException {};
 

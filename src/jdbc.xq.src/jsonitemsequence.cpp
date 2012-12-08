@@ -35,41 +35,30 @@ namespace jdbc
       CHECK_EXCEPTION(env);
       jclass cResultSetMetadata = env->FindClass("java/sql/ResultSetMetaData");
       CHECK_EXCEPTION(env);
-      oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "ResultSetMetaData", "()Ljava/sql/ResultSetMetaData;"));
+      oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "getMetaData", "()Ljava/sql/ResultSetMetaData;"));
       CHECK_EXCEPTION(env);
       columnCount = env->CallIntMethod(oMetadata, env->GetMethodID(cResultSetMetadata, "getColumnCount", "()I"));
       CHECK_EXCEPTION(env);
       env->CallVoidMethod(oResultSet, env->GetMethodID(cResultSet, "beforeFirst", "()V"));
       CHECK_EXCEPTION(env);
-      
       // Getting column names and types
       jmethodID mColumnType = env->GetMethodID(cResultSetMetadata, "getColumnType", "(I)I");
       jmethodID mColumnName = env->GetMethodID(cResultSetMetadata, "getColumnName", "(I)Ljava/lang/String;");
-      columnNames = new std::string[columnCount];
+      columnNames = new String[columnCount];
       columnTypes = new long[columnCount];
       for(int i=0; i<columnCount; i++){
-        jstring oName = (jstring) env->CallObjectMethod(oMetadata, mColumnName, i);
+        jstring oName = (jstring) env->CallObjectMethod(oMetadata, mColumnName, i+1);
         CHECK_EXCEPTION(env);
         columnNames[i] = env->GetStringUTFChars(oName, NULL);
         CHECK_EXCEPTION(env);
-        LOG("Getting column ["<< i << "] with name: " << columnNames[i])
-        columnTypes[i] = env->CallIntMethod(oMetadata, mColumnType, i);
+        columnTypes[i] = env->CallIntMethod(oMetadata, mColumnType, i+1);
         CHECK_EXCEPTION(env);
       }
-
       mNext = env->GetMethodID(cResultSet, "next", "()Z");
       mGetInt = env->GetMethodID(cResultSet, "getInt", "(I)I");
       mGetDouble = env->GetMethodID(cResultSet, "getDouble", "(I)D");
       mGetString = env->GetMethodID(cResultSet, "getString", "(I)Ljava/lang/String;");
-    }
-    catch (zorba::jvm::VMOpenException&)
-	  {
-      JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	  }
-	  catch (JavaException&)
-	  {
-      JdbcModule::throwJavaException(env, lException);
-	  }
+    JDBC_MODULE_CATCH
     itOpen=true;
   }
 
@@ -85,22 +74,19 @@ namespace jdbc
         return result;
 
       std::vector<std::pair<zorba::Item, zorba::Item>> elements;
-
       for(int i=0; i<columnCount; i++){
         zorba::Item aKey = itemFactory->createString(columnNames[i]);
         zorba::Item aValue;
-
         if (SQLTypes::isInt(columnTypes[i])) {
-          int value = env->CallIntMethod(oResultSet, mGetInt, i);
+          int value = env->CallIntMethod(oResultSet, mGetInt, i+1);
           CHECK_EXCEPTION(env);
           aValue = itemFactory->createInt(value);
         } else if (SQLTypes::isFloat(columnTypes[i])) {
-          double value = env->CallDoubleMethod(oResultSet, mGetDouble, i);
+          double value = env->CallDoubleMethod(oResultSet, mGetDouble, i+1);
           CHECK_EXCEPTION(env);
           aValue = itemFactory->createDouble(value);
-          break;
         } else {
-          jstring sValue = (jstring) env->CallObjectMethod(oResultSet, mGetString, i);
+          jstring sValue = (jstring) env->CallObjectMethod(oResultSet, mGetString, i+1);
           CHECK_EXCEPTION(env);
           const char *value = env->GetStringUTFChars(sValue, NULL);
           CHECK_EXCEPTION(env);

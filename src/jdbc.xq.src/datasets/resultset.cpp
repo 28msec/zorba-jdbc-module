@@ -51,7 +51,7 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     int iUpdateCount = env->CallIntMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getUpdateCount", "()I"));
     CHECK_EXCEPTION(env);
-    if (iUpdateCount == -1) {
+    if (iUpdateCount != -1) {
        JdbcModule::throwError("SQL005", "Query must be a non-updating query.");
     }
 

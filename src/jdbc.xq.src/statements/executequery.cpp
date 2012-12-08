@@ -54,7 +54,8 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
-    result = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;"), lQuery);
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    result = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;"), query);
     CHECK_EXCEPTION(env);
 
   JDBC_MODULE_CATCH
