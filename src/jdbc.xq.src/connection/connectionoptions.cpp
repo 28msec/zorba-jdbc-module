@@ -93,13 +93,13 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
   }
   catch (zorba::jvm::VMOpenException&)
-	{
+  {
     JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	}
-	catch (JavaException&)
-	{
+  }
+  catch (JavaException&)
+  {
     JdbcModule::throwJavaException(env, lException);
-	}
+  }
   
   return ItemSequence_t(new SingletonItemSequence(result));
 }

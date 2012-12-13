@@ -41,14 +41,14 @@ class DisconnectFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~DisconnectFunction()
+    ~DisconnectFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "disconnect"; }
 
     virtual ItemSequence_t 

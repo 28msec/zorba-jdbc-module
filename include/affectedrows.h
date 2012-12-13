@@ -41,14 +41,14 @@ class AffectedRowsFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~AffectedRowsFunction()
+    ~AffectedRowsFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "affected-rows"; }
 
     virtual ItemSequence_t 

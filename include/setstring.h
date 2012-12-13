@@ -41,14 +41,14 @@ class SetStringFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~SetStringFunction()
+    ~SetStringFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "set-string"; }
 
     virtual ItemSequence_t 

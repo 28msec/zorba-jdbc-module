@@ -41,14 +41,14 @@ class ClearParamsFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~ClearParamsFunction()
+    ~ClearParamsFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "clear-params"; }
 
     virtual ItemSequence_t 

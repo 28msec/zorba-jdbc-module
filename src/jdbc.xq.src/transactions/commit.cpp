@@ -50,7 +50,7 @@ CommitFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
   JDBC_MODULE_CATCH
   
-	return ItemSequence_t(new EmptySequence());
+  return ItemSequence_t(new EmptySequence());
 }
 
 }}; // namespace zorba, jdbc

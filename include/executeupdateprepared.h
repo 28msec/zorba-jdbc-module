@@ -41,14 +41,14 @@ class ExecuteUpdatePreparedFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~ExecuteUpdatePreparedFunction()
+    ~ExecuteUpdatePreparedFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "execute-update-prepared"; }
 
     virtual ItemSequence_t 

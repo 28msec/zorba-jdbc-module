@@ -41,14 +41,14 @@ class SetBooleanFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~SetBooleanFunction()
+    ~SetBooleanFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "set-boolean"; }
 
     virtual ItemSequence_t 

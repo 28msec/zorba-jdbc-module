@@ -99,13 +99,13 @@ namespace jdbc
       result = true;
     }
     catch (zorba::jvm::VMOpenException&)
-	  {
+    {
       JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-	  }
-	  catch (JavaException&)
-	  {
+    }
+    catch (JavaException&)
+    {
       JdbcModule::throwJavaException(env, lException);
-	  }
+    }
     return result;
   }
 

@@ -31,12 +31,12 @@
 class JavaException {};
 
 #define CHECK_EXCEPTION(env)  if ((lException = env->ExceptionOccurred())) throw JavaException()
-#define JDBC_MODULE_TRY  jthrowable lException = 0;	try   {
-#define JDBC_MODULE_CATCH 	}  catch (zorba::jvm::VMOpenException&)	{ \
+#define JDBC_MODULE_TRY  jthrowable lException = 0;  try   {
+#define JDBC_MODULE_CATCH   }  catch (zorba::jvm::VMOpenException&)  { \
                               JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?)."); \
-	                          }  catch (JavaException&)	{ \
+                            }  catch (JavaException&)  { \
                                JdbcModule::throwJavaException(env, lException); \
-                          	}
+                            }
 
 #define LOG_ACTIVE
 #ifdef LOG_ACTIVE
@@ -65,21 +65,21 @@ class JdbcModule : public ExternalModule {
 
     FuncMap_t theFunctions;
 
-	public:
+  public:
     JdbcModule() 
-		{
+    {
     }
 
-		~JdbcModule()
-		{}
+    ~JdbcModule()
+    {}
 
-		virtual String getURI() const
-		{ return JDBC_MODULE_NAMESPACE; }
+    virtual String getURI() const
+    { return JDBC_MODULE_NAMESPACE; }
 
     virtual ExternalFunction* getExternalFunction(const String& localName);
 
-		virtual void destroy()
-		{
+    virtual void destroy()
+    {
       delete this;
     }
 

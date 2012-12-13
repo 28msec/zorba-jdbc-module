@@ -41,14 +41,14 @@ class ParameterMetadataFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~ParameterMetadataFunction()
+    ~ParameterMetadataFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "parameter-metadata"; }
 
     virtual ItemSequence_t 

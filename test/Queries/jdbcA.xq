@@ -53,7 +53,7 @@ CREATE TABLE `students` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 ");
 jdbc:execute-update($connection, "
-INSERT  INTO `students`(`idStudent`,`Name`,`Address`,`Birthday`,`Weight`) VALUES (1,'Rodolfo Ochoa','	10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-06',160),(2,'Dana Florescu','	10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-13',150),(3,'Cezar Andrei','	10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-27',160);
+INSERT  INTO `students`(`idStudent`,`Name`,`Address`,`Birthday`,`Weight`) VALUES (1,'Rodolfo Ochoa','  10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-06',160),(2,'Dana Florescu','10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-13',150),(3,'Cezar Andrei','  10 Van De Graaff Dr # 1  Burlington, MA 01803','2012-12-27',160);
 ");
 
 

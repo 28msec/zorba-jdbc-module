@@ -189,36 +189,36 @@ JdbcModule::throwError(const char *aLocalName, String aErrorMessage)
 void
 JdbcModule::throwJavaException(JNIEnv *env, jthrowable& lException)
 {
-	jclass stringWriterClass = env->FindClass("java/io/StringWriter");
-	jclass printWriterClass = env->FindClass("java/io/PrintWriter");
-	jclass throwableClass = env->FindClass("java/lang/Throwable");
-	jobject stringWriter = env->NewObject(
-			stringWriterClass,
-			env->GetMethodID(stringWriterClass, "<init>", "()V"));
+  jclass stringWriterClass = env->FindClass("java/io/StringWriter");
+  jclass printWriterClass = env->FindClass("java/io/PrintWriter");
+  jclass throwableClass = env->FindClass("java/lang/Throwable");
+  jobject stringWriter = env->NewObject(
+      stringWriterClass,
+      env->GetMethodID(stringWriterClass, "<init>", "()V"));
 
-	jobject printWriter = env->NewObject(
-			printWriterClass,
-			env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
-			stringWriter);
+  jobject printWriter = env->NewObject(
+      printWriterClass,
+      env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
+      stringWriter);
 
-	env->CallObjectMethod(lException,
-			env->GetMethodID(throwableClass, "printStackTrace",
-					"(Ljava/io/PrintWriter;)V"),
-			printWriter);
+  env->CallObjectMethod(lException,
+      env->GetMethodID(throwableClass, "printStackTrace",
+          "(Ljava/io/PrintWriter;)V"),
+      printWriter);
 
-	//env->CallObjectMethod(printWriter, env->GetMethodID(printWriterClass, "flush", "()V"));
-	jmethodID toStringMethod =
-		env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
-	jobject errorMessageObj = env->CallObjectMethod(
-			stringWriter, toStringMethod);
-	jstring errorMessage = (jstring) errorMessageObj;
-	const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
-	std::stringstream s;
-	s << "A Java Exception was thrown:" << std::endl << errMsg;
-	env->ReleaseStringUTFChars(errorMessage, errMsg);
-	std::string err("");
-	err += s.str();
-	env->ExceptionClear();
+  //env->CallObjectMethod(printWriter, env->GetMethodID(printWriterClass, "flush", "()V"));
+  jmethodID toStringMethod =
+    env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
+  jobject errorMessageObj = env->CallObjectMethod(
+      stringWriter, toStringMethod);
+  jstring errorMessage = (jstring) errorMessageObj;
+  const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
+  std::stringstream s;
+  s << "A Java Exception was thrown:" << std::endl << errMsg;
+  env->ReleaseStringUTFChars(errorMessage, errMsg);
+  std::string err("");
+  err += s.str();
+  env->ExceptionClear();
   JdbcModule::throwError("JAVA-EXCEPTION", err);
 }
 
@@ -239,23 +239,23 @@ String
 JdbcModule::getStringArg(const ExternalFunction::Arguments_t& args, int index) {
   String result;  
   Iterator_t lIter = args[index]->getIterator();
-	lIter->open();
-	Item item;
-	if( lIter->next(item) )
-	{
+  lIter->open();
+  Item item;
+  if( lIter->next(item) )
+  {
     result = item.getStringValue();
   }
-	lIter->close();
+  lIter->close();
   return result;
 }
 
 Item
 JdbcModule::getItemArg(const ExternalFunction::Arguments_t& args, int index) {
   Iterator_t lIter = args[index]->getIterator();
-	lIter->open();
-	Item item;
-	lIter->next(item);
-	lIter->close();
+  lIter->open();
+  Item item;
+  lIter->next(item);
+  lIter->close();
   return item;
 }
 

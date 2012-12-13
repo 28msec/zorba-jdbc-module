@@ -41,14 +41,14 @@ class ConnectionOptionsFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~ConnectionOptionsFunction()
+    ~ConnectionOptionsFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "connection-options"; }
 
     virtual ItemSequence_t 

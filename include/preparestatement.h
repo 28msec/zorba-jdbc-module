@@ -41,14 +41,14 @@ class PrepareStatementFunction : public ContextualExternalFunction
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-		~PrepareStatementFunction()
+    ~PrepareStatementFunction()
     {}
 
   public:
-		virtual String getURI() const
-		{ return theModule->getURI(); }
+    virtual String getURI() const
+    { return theModule->getURI(); }
 
-		virtual String getLocalName() const
+    virtual String getLocalName() const
     { return "prepare-statement"; }
 
     virtual ItemSequence_t 
