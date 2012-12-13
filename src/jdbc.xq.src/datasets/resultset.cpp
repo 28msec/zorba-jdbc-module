@@ -30,7 +30,7 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::DynamicContext* aDynamincContext) const
 {
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jobject result;
+  jobject result=NULL;
 
   JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);

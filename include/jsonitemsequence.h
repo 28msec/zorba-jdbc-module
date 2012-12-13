@@ -33,6 +33,7 @@ namespace jdbc
       class JSONIterator : public Iterator
       {
         protected:
+          bool itOpen;
           jclass cResultSet;
           jobject oResultSet;
           JNIEnv* env;
@@ -41,7 +42,6 @@ namespace jdbc
           long columnCount;
           zorba::ItemFactory* itemFactory;
           jobject oMetadata;
-          bool itOpen;
           jmethodID mNext;
           jmethodID mGetInt;
           jmethodID mGetDouble;
