@@ -17,6 +17,8 @@
 #include "setstring.h"
 #include "jdbc.h"
 
+using namespace zorba::store;
+
 namespace zorba
 {
 namespace jdbc
@@ -51,7 +53,7 @@ ItemSequence_t
 
     jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
-    if (type == zorba::store::SchemaTypeCode::XS_STRING) {
+    if (type == XS_STRING) {
       jstring val =  env->NewStringUTF(value.getStringValue().c_str());
       env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setString", "(ILjava/lang/String;)V"), index, val);
     } else {

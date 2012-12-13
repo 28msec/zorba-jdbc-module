@@ -73,7 +73,7 @@ namespace jdbc
       if (hasNext == JNI_FALSE)
         return result;
 
-      std::vector<std::pair<zorba::Item, zorba::Item>> elements;
+      std::vector<std::pair<zorba::Item, zorba::Item> > elements;
       for(int i=0; i<columnCount; i++){
         zorba::Item aKey = itemFactory->createString(columnNames[i]);
         zorba::Item aValue;

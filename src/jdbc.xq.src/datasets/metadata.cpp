@@ -52,7 +52,7 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
     int rowsAffected = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "getUpdateCount", "()I"));
     CHECK_EXCEPTION(env);
 
-    std::vector<std::pair<zorba::Item, zorba::Item>> vResult;
+    std::vector<std::pair<zorba::Item, zorba::Item> > vResult;
     if (rowsAffected==-1) { // NON UPDATE QUERY
       jobject oResultSet = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;"));
       CHECK_EXCEPTION(env);
@@ -74,7 +74,7 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
       std::vector<zorba::Item> elements;
 
       for (int i=1; i<=columns; i++) {
-          std::vector<std::pair<zorba::Item, zorba::Item>> column;
+          std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
           jstring oName = (jstring) env->CallObjectMethod(oMetadata, mName, i);
           CHECK_EXCEPTION(env);

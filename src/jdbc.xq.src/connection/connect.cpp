@@ -31,7 +31,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
   JDBC_MODULE_TRY
-    jstring url, username, password;
+    jstring url(NULL), username(NULL), password(NULL);
     Item item = JdbcModule::getItemArg(args, 0);
     bool hasUsername=false;
     if (item.isJSONItem()) 

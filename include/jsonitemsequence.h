@@ -49,7 +49,7 @@ namespace jdbc
 
         public:
           JSONIterator(jobject resultSet, JNIEnv* env):
-            oResultSet(resultSet),env(env),columnNames(NULL),columnCount(0), itOpen(false), oMetadata(NULL) {}
+            itOpen(false), oResultSet(resultSet),env(env),columnNames(NULL),columnCount(0), oMetadata(NULL) {}
 
           virtual ~JSONIterator() {
           }

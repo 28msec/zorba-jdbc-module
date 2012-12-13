@@ -17,6 +17,8 @@
 #include "setnumeric.h"
 #include "jdbc.h"
 
+using namespace zorba::store;
+
 namespace zorba
 {
 namespace jdbc
@@ -53,16 +55,16 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
     CHECK_EXCEPTION(env);
 
     switch (type) {
-      case zorba::store::SchemaTypeCode::XS_DOUBLE:
+      case XS_DOUBLE:
         env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index, value.getDoubleValue());
       break;
-      case zorba::store::SchemaTypeCode::XS_FLOAT:
+      case XS_FLOAT:
         env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setFloat", "(IF)V"), index, value.getDoubleValue());
       break;
-      case zorba::store::SchemaTypeCode::XS_INTEGER:
+      case XS_INTEGER:
         env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setLong", "(IJ)V"), index, value.getLongValue());
       break;
-      case zorba::store::SchemaTypeCode::XS_DECIMAL:
+      case XS_DECIMAL:
         double dVal;
         sscanf(value.getStringValue().c_str(), "%lf", &dVal);
         env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index,  dVal);

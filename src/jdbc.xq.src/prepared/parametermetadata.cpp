@@ -63,7 +63,7 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
     std::vector<zorba::Item> elements;
 
     for (int i=1; i<=columns; i++) {
-        std::vector<std::pair<zorba::Item, zorba::Item>> column;
+        std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
         jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterName, i);
         CHECK_EXCEPTION(env);
@@ -75,15 +75,15 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
         jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterType, i);
         CHECK_EXCEPTION(env);
-        String  sType = env->GetStringUTFChars(oName, NULL);
+        String  sType = env->GetStringUTFChars(oType, NULL);
         CHECK_EXCEPTION(env); 
-        zorba::Item iType = itemFactory->createString(sName);
+        zorba::Item iType = itemFactory->createString(sType);
         std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
         column.push_back(pType);
         elements.push_back(itemFactory->createJSONObject(column));
     }
     std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createJSONArray(elements));
-    std::vector<std::pair<zorba::Item, zorba::Item>> vResult;
+    std::vector<std::pair<zorba::Item, zorba::Item> > vResult;
     vResult.push_back(allColumns);
     result = itemFactory->createJSONObject(vResult);
 

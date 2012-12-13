@@ -17,6 +17,8 @@
 #include "setboolean.h"
 #include "jdbc.h"
 
+using namespace zorba::store;
+
 namespace zorba
 {
 namespace jdbc
@@ -51,7 +53,7 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
     CHECK_EXCEPTION(env);
-    if (type == zorba::store::SchemaTypeCode::XS_BOOLEAN) {
+    if (type == XS_BOOLEAN) {
       jboolean val = JNI_FALSE;
       if (value.getBooleanValue())
         val = JNI_TRUE;

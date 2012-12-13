@@ -50,7 +50,7 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
       JdbcModule::throwError("SQL08003", "Connection does not exist.");
     }
 
-    std::vector<std::pair<Item, Item>> resultVector;
+    std::vector<std::pair<Item, Item> > resultVector;
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
     jboolean isAutocommit = env->CallBooleanMethod(oConnection, env->GetMethodID(cConnection, "getAutoCommit", "()Z"));
