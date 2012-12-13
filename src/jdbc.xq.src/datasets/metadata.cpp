@@ -86,9 +86,9 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
           jstring oType = (jstring) env->CallObjectMethod(oMetadata, mType, i);
           CHECK_EXCEPTION(env);
-          String  sType = env->GetStringUTFChars(oName, NULL);
+          String  sType = env->GetStringUTFChars(oType, NULL);
           CHECK_EXCEPTION(env); 
-          zorba::Item iType = itemFactory->createString(sName);
+          zorba::Item iType = itemFactory->createString(sType);
           std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
           column.push_back(pType);
           elements.push_back(itemFactory->createJSONObject(column));
