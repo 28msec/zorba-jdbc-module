@@ -31,18 +31,10 @@ RollbackFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
 
   JDBC_MODULE_TRY
-    String lStrUUID = JdbcModule::getStringArg(args, 0);
+    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
 
-    InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
-    jobject oConnection = lInstanceMap->getInstance(lStrUUID);
-    if(oConnection==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
+    jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
+
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
     env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "rollback", "()V"));

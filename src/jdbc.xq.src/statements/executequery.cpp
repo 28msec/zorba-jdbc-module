@@ -36,17 +36,7 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
 
-
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
-    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
-    if(oConnection==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
+    jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);

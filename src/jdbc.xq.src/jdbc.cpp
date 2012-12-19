@@ -251,11 +251,13 @@ JdbcModule::getStringArg(const ExternalFunction::Arguments_t& args, int index) {
 
 Item
 JdbcModule::getItemArg(const ExternalFunction::Arguments_t& args, int index) {
-  Iterator_t lIter = args[index]->getIterator();
-  lIter->open();
   Item item;
-  lIter->next(item);
-  lIter->close();
+  if (index < args.size()) {
+    Iterator_t lIter = args[index]->getIterator();
+    lIter->open();
+    lIter->next(item);
+    lIter->close();
+  }
   return item;
 }
 
@@ -281,14 +283,32 @@ InstanceMap*
   return result;
 }
 
-InstanceMap* 
-  JdbcModule::getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName) {
-  InstanceMap* result;
-  DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-  result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName));
-  return result;
+jobject 
+  JdbcModule::getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap) {
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, aMap);
+    if (lInstanceMap==NULL)
+    { 
+      if (aMap == INSTANCE_MAP_CONNECTIONS) {
+        JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
+        JdbcModule::throwError("SQL003", "Statement does not exist.");
+      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
+        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      }
+    }
+    jobject oResult = lInstanceMap->getInstance(aObjectUUID);
+    if(oResult==NULL)
+    {
+      if (aMap == INSTANCE_MAP_CONNECTIONS) {
+        JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
+        JdbcModule::throwError("SQL003", "Statement does not exist.");
+      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
+        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      }
+    }
+    return oResult;
 }
-
 
 }}; // namespace zorba, jdbc
 

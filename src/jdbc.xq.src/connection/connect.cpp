@@ -75,6 +75,38 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, url);
       CHECK_EXCEPTION(env);
     }
+    item = JdbcModule::getItemArg(args, 1);
+    if ((!item.isNull()) && (item.isJSONItem()))
+    {
+      jclass cConnection = env->FindClass("java/sql/Connection");
+      Iterator_t lKeys = item.getObjectKeys();
+      lKeys->open();
+      Item lKey;
+      while (lKeys->next(lKey))
+      {
+        zorba::String keystring = lKey.getStringValue();
+        if (keystring=="autocommit") {
+          jboolean value = JNI_FALSE;
+          if (item.getObjectValue(keystring).getBooleanValue()) {
+            value = JNI_TRUE;
+          }
+          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setAutoCommit", "(Z)V"), value);
+          CHECK_EXCEPTION(env);
+        } else if (keystring=="readonly") {
+          jboolean value = JNI_FALSE;
+          if (item.getObjectValue(keystring).getBooleanValue()) {
+            value = JNI_TRUE;
+          }
+          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setReadOnly", "(Z)V"), value);
+          CHECK_EXCEPTION(env);
+        } else if (keystring=="isolation-level") {
+          jint isolationLevel = (int) item.getObjectValue(keystring).getLongValue();
+          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setTransactionIsolation", "(I)V"), isolationLevel);
+          CHECK_EXCEPTION(env);
+        }
+      }
+      lKeys->close();
+    }
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
     String lStrUUID = JdbcModule::getUUID();

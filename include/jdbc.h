@@ -26,7 +26,6 @@
 #define INSTANCE_MAP_CONNECTIONS "JdbcInstanceMapConnections"
 #define INSTANCE_MAP_STATEMENTS "JdbcInstanceMapStatements"
 #define INSTANCE_MAP_PREPAREDSTATEMENTS "JdbcInstanceMapPreparedStatements"
-#define INSTANCE_MAP_RECORDSETS "JdbcInstanceMapRecordSets"
 
 class JavaException {};
 
@@ -105,6 +104,8 @@ class JdbcModule : public ExternalModule {
       getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
     static InstanceMap* 
       getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
+    static jobject 
+      getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
 
 };
 

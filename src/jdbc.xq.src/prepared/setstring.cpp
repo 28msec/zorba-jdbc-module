@@ -36,18 +36,9 @@ ItemSequence_t
   JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-    }
-    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
-    if(oPreparedStatement==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-    }
+    jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    int index = JdbcModule::getItemArg(args, 1).getLongValue();
+    long index = (long)JdbcModule::getItemArg(args, 1).getLongValue();
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 

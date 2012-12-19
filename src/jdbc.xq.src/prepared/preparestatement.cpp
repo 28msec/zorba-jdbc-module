@@ -35,16 +35,8 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
     String lQuery = JdbcModule::getStringArg(args, 1);
-    InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
-    jobject oConnection = lInstanceMap->getInstance(lConnectionUUID);
-    if(oConnection==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
+
+    jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
@@ -52,7 +44,7 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
     jobject oPrepared = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;"), query);
     CHECK_EXCEPTION(env);
 
-    lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     String resultUUID = JdbcModule::getUUID();
     lInstanceMap->storeInstance(resultUUID, oPrepared);
 

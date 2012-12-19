@@ -29,21 +29,12 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::DynamicContext* aDynamincContext) const
 {
   JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
-  jobject oConnection;
 
   JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
-    DynamicContext* lDctx = const_cast<DynamicContext*>(aDynamincContext);
-    InstanceMap* lInstanceMap;
-    if (!(lInstanceMap = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(INSTANCE_MAP_CONNECTIONS))))
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
-    if(!(oConnection = lInstanceMap->getInstance(lStrUUID)))
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
+    jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
+
     jclass cConnection = env->FindClass("java/sql/Connection");
     CHECK_EXCEPTION(env);
     jmethodID mIsClosed = env->GetMethodID(cConnection, "isClosed", "()Z");

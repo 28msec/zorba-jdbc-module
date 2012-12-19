@@ -39,16 +39,8 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
   JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
-    InstanceMap* lInstanceMap = JdbcModule::getInstanceMap(aDynamincContext, INSTANCE_MAP_CONNECTIONS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
-    jobject oConnection = lInstanceMap->getInstance(lStrUUID);
-    if(oConnection==NULL)
-    {
-      JdbcModule::throwError("SQL08003", "Connection does not exist.");
-    }
+
+    jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
     std::vector<std::pair<Item, Item> > resultVector;
     jclass cConnection = env->FindClass("java/sql/Connection");

@@ -16,6 +16,14 @@ xquery version "3.0";
  : limitations under the License.
  :)
 
+(:~
+ : This module contains functions to connect to any JDBC datasource 
+ : using jvm-util module to handle Java interaction.
+ :
+ : @author Rodolfo Ochoa
+ : @project other data sources/jdbc module
+ :)
+
 module namespace jdbc = "http://www.zorba-xquery.com/modules/jdbc";
 
 declare namespace err = "http://www.w3.org/2005/xqt-errors";
@@ -34,12 +42,21 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  :)
 
 (:
- :  2.1 Opens a connection to a relational database.
+ : Opens a connection to a relational database.
+ : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
+ :
+ : @param $connection-config
+ : In detail, the $connection-config is specified as follows:
+ : { "url" : xs:string, 
+ :   "user"? : xs:string,
+ :   "password"? : xs:string }
+ : 
+ : @error 
  :)
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object() ) as xs:anyURI external;
 (:
- :  2.1 Opens a connection to a relational database with specified options.
+ :  Opens a connection to a relational database with specified options.
  :)
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object(), 

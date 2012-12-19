@@ -35,16 +35,7 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Statement does not exist.");
-    }
-    jobject oPreparedStatement = lInstanceMap->getInstance(lStatementUUID);
-    if(oPreparedStatement==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Statement does not exist.");
-    }
+    jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
     jclass cPreparedStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);

@@ -33,16 +33,9 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
   JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
-    if (lInstanceMap==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Statement does not exist.");
-    }
-    jobject oStatement = lInstanceMap->getInstance(lStatementUUID);
-    if(oStatement==NULL)
-    {
-      JdbcModule::throwError("SQL003", "Statement does not exist.");
-    }
+
+    jobject oStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
+
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
     jclass cStatement = env->FindClass("java/sql/Statement");
     CHECK_EXCEPTION(env);
