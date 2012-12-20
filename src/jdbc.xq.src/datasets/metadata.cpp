@@ -39,8 +39,7 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
 
-    jclass cStatement = env->FindClass("java/sql/Statement");
-    CHECK_EXCEPTION(env);
+    jclass cStatement = JdbcModule::getJavaClass(JC_STATEMENT, env);
 
     int rowsAffected = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "getUpdateCount", "()I"));
     CHECK_EXCEPTION(env);
@@ -50,14 +49,12 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
       jobject oResultSet = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;"));
       CHECK_EXCEPTION(env);
 
-      jclass cResultSet = env->FindClass("java/sql/ResultSet");
-      CHECK_EXCEPTION(env);
+      jclass cResultSet = JdbcModule::getJavaClass(JC_RESULT_SET, env);
 
       jobject oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "getMetaData", "()Ljava/sql/ResultSetMetaData;"));
       CHECK_EXCEPTION(env);
 
-      jclass cResultSetMetaData = env->FindClass("java/sql/ResultSetMetaData");
-      CHECK_EXCEPTION(env);
+      jclass cResultSetMetaData = JdbcModule::getJavaClass(JC_RESULT_SET_METADATA, env);
 
       int columns = env->CallIntMethod(oResultSet, env->GetMethodID(cResultSet, "getColumnCount", "()I"));
       CHECK_EXCEPTION(env);

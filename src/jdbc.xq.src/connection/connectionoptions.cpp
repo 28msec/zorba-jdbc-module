@@ -43,30 +43,33 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
     std::vector<std::pair<Item, Item> > resultVector;
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
-    jboolean isAutocommit = env->CallBooleanMethod(oConnection, env->GetMethodID(cConnection, "getAutoCommit", "()Z"));
+
+    if (cConnection == NULL) {
+      cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
+    }
+
+    jboolean isAutocommit = env->CallBooleanMethod(oConnection, getAutoCommit(env));
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("autocommit"), theFactory->createBoolean(isAutocommit==JNI_TRUE)));
     CHECK_EXCEPTION(env);
-    jboolean isReadonly = env->CallBooleanMethod(oConnection, env->GetMethodID(cConnection, "isReadOnly", "()Z"));
+    jboolean isReadonly = env->CallBooleanMethod(oConnection, isReadOnly(env));
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("readonly"), theFactory->createBoolean(isReadonly==JNI_TRUE)));
     CHECK_EXCEPTION(env);
 
     if (!isolationLevelsLoaded) {
-      TRANSACTION_NONE = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_NONE", "I"));
+      TRANSACTION_NONE = env->GetStaticIntField(cConnection, T_NONE(env));
       CHECK_EXCEPTION(env);
-      TRANSACTION_READ_UNCOMMITTED = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_READ_UNCOMMITTED", "I"));
+      TRANSACTION_READ_UNCOMMITTED = env->GetStaticIntField(cConnection, T_UNCOMMITTED(env));
       CHECK_EXCEPTION(env);
-      TRANSACTION_READ_COMMITTED = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_READ_COMMITTED", "I"));
+      TRANSACTION_READ_COMMITTED = env->GetStaticIntField(cConnection, T_COMMITTED(env));
       CHECK_EXCEPTION(env);
-      TRANSACTION_REPEATABLE_READ = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_REPEATABLE_READ", "I"));
+      TRANSACTION_REPEATABLE_READ = env->GetStaticIntField(cConnection, T_REPEATABLE(env));
       CHECK_EXCEPTION(env);
-      TRANSACTION_SERIALIZABLE = env->GetStaticIntField(cConnection, env->GetStaticFieldID(cConnection, "TRANSACTION_SERIALIZABLE", "I"));
+      TRANSACTION_SERIALIZABLE = env->GetStaticIntField(cConnection, T_SERIALIZABLE(env));
       CHECK_EXCEPTION(env);
       isolationLevelsLoaded=true;
     }
 
-    int isolationLevel = env->CallIntMethod(oConnection, env->GetMethodID(cConnection, "getTransactionIsolation", "()I"));
+    int isolationLevel = env->CallIntMethod(oConnection, getTransactionIsolation(env));
     CHECK_EXCEPTION(env);
     String isolLevel;
     if (isolationLevel==TRANSACTION_NONE) {
@@ -83,17 +86,69 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("isolation-level"), theFactory->createString(isolLevel)));
     result = theFactory->createJSONObject(resultVector);
 
-  }
-  catch (zorba::jvm::VMOpenException&)
-  {
-    JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-  }
-  catch (JavaException&)
-  {
-    JdbcModule::throwJavaException(env, lException);
-  }
+  JDBC_MODULE_CATCH
   
   return ItemSequence_t(new SingletonItemSequence(result));
 }
+
+jclass ConnectionOptionsFunction::cConnection = NULL;
+jmethodID ConnectionOptionsFunction::getAutoCommit(JNIEnv *env) {
+  static jmethodID mGetAutoCommit=NULL;
+  if (mGetAutoCommit==NULL) {
+    mGetAutoCommit=env->GetMethodID(cConnection, "getAutoCommit", "()Z");
+  }
+  return mGetAutoCommit;
+}
+jmethodID ConnectionOptionsFunction::isReadOnly(JNIEnv *env) {
+  static jmethodID mIsReadOnly=NULL;
+  if (mIsReadOnly==NULL) {
+    mIsReadOnly=env->GetMethodID(cConnection, "isReadOnly", "()Z");
+  }
+  return mIsReadOnly;
+}
+jfieldID ConnectionOptionsFunction::T_NONE(JNIEnv *env) {
+  static jfieldID fT_NONE=NULL;
+  if (fT_NONE==NULL) {
+    fT_NONE=env->GetStaticFieldID(cConnection, "TRANSACTION_NONE", "I");
+  }
+  return fT_NONE;
+}
+jfieldID ConnectionOptionsFunction::T_UNCOMMITTED(JNIEnv *env) {
+  static jfieldID fT_UNCOMMITTED=NULL;
+  if (fT_UNCOMMITTED==NULL) {
+    fT_UNCOMMITTED=env->GetStaticFieldID(cConnection, "TRANSACTION_READ_UNCOMMITTED", "I");
+  }
+  return fT_UNCOMMITTED;
+}
+jfieldID ConnectionOptionsFunction::T_COMMITTED(JNIEnv *env) {
+  static jfieldID fT_COMMITTED=NULL;
+  if (fT_COMMITTED==NULL) {
+    fT_COMMITTED=env->GetStaticFieldID(cConnection, "TRANSACTION_READ_COMMITTED", "I");
+  }
+  return fT_COMMITTED;
+}
+jfieldID ConnectionOptionsFunction::T_REPEATABLE(JNIEnv *env) {
+  static jfieldID fT_REPEATABLE=NULL;
+  if (fT_REPEATABLE==NULL) {
+    fT_REPEATABLE=env->GetStaticFieldID(cConnection, "TRANSACTION_REPEATABLE_READ", "I");
+  }
+  return fT_REPEATABLE;
+}
+jfieldID ConnectionOptionsFunction::T_SERIALIZABLE(JNIEnv *env) {
+  static jfieldID fT_SERIALIZABLE=NULL;
+  if (fT_SERIALIZABLE==NULL) {
+    fT_SERIALIZABLE=env->GetStaticFieldID(cConnection, "TRANSACTION_SERIALIZABLE", "I");
+  }
+  return fT_SERIALIZABLE;
+}
+jmethodID ConnectionOptionsFunction::getTransactionIsolation(JNIEnv *env) {
+  static jmethodID mGetTransactionIsolation=NULL;
+  if (mGetTransactionIsolation==NULL) {
+    mGetTransactionIsolation=env->GetMethodID(cConnection, "getTransactionIsolation", "()I");
+  }
+  return mGetTransactionIsolation;
+}
+
+
 
 }}; // namespace zorba, jdbc

@@ -36,9 +36,18 @@ ClearParamsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
-    CHECK_EXCEPTION(env);
-    env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "clearParameters", "()V"));
+    static jclass cPreparedStatement = NULL;
+    if (cPreparedStatement==NULL) {
+      cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    }
+
+    static jmethodID mClearParams = NULL;
+    if (mClearParams==NULL) {
+      mClearParams = env->GetMethodID(cPreparedStatement, "clearParameters", "()V");
+      CHECK_EXCEPTION(env);
+    }
+
+    env->CallVoidMethod(oPreparedStatement, mClearParams);
     CHECK_EXCEPTION(env);
 
   JDBC_MODULE_CATCH

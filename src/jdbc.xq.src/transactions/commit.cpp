@@ -35,9 +35,18 @@ CommitFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
-    env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "commit", "()V"));
+    static jclass cConnection = NULL;
+    if (cConnection == NULL) {
+      cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
+    }
+
+    static jmethodID mCommit = NULL;
+    if (mCommit==NULL) {
+      mCommit = env->GetMethodID(cConnection, "commit", "()V");
+      CHECK_EXCEPTION(env);
+    }
+
+    env->CallVoidMethod(oConnection, mCommit);
     CHECK_EXCEPTION(env);
 
   JDBC_MODULE_CATCH

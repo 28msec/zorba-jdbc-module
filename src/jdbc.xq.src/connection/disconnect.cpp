@@ -35,8 +35,8 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
+    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
+
     jmethodID mIsClosed = env->GetMethodID(cConnection, "isClosed", "()Z");
     CHECK_EXCEPTION(env);
     jboolean isClosed = env->CallBooleanMethod(oConnection, mIsClosed);

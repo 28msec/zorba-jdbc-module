@@ -42,8 +42,8 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
-    CHECK_EXCEPTION(env);
+    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+
     if (type == XS_BOOLEAN) {
       jboolean val = JNI_FALSE;
       if (value.getBooleanValue())

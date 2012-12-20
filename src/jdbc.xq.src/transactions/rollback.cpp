@@ -35,8 +35,7 @@ RollbackFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
+    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
     env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "rollback", "()V"));
     CHECK_EXCEPTION(env);
 

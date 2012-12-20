@@ -36,14 +36,12 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
-    CHECK_EXCEPTION(env);
+    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
 
     jobject oParameterMetadata = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;"));
     CHECK_EXCEPTION(env);
 
-    jclass cParameterMetaData = env->FindClass("java/sql/ParameterMetaData");
-    CHECK_EXCEPTION(env);
+    jclass cParameterMetaData = JdbcModule::getJavaClass(JC_PARAMETER_META_DATA, env);
 
     long index = (long)JdbcModule::getItemArg(args, 1).getLongValue();
     int parameterType = env->CallIntMethod(oParameterMetadata, env->GetMethodID(cParameterMetaData, "getParameterType", "(I)I"), index);

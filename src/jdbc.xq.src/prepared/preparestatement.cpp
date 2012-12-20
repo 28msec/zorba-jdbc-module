@@ -38,8 +38,7 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = env->FindClass("java/sql/Connection");
-    CHECK_EXCEPTION(env);
+    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
     jstring query =  env->NewStringUTF(lQuery.c_str());
     jobject oPrepared = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;"), query);
     CHECK_EXCEPTION(env);

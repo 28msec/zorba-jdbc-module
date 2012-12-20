@@ -49,6 +49,19 @@ namespace zorba
 namespace jdbc
 {
 
+
+enum JavaClasses {
+  JC_DRIVER_MANAGER,
+  JC_CONNECTION,
+  JC_STATEMENT,
+  JC_RESULT_SET,
+  JC_RESULT_SET_METADATA,
+  JC_PREPARED_STATEMEMT,
+  JC_PARAMETER_META_DATA
+};
+
+typedef std::map<JavaClasses, jclass> JavaClassMap_t;
+
 class JdbcModule : public ExternalModule {
   protected:
     class ltstr
@@ -61,8 +74,7 @@ class JdbcModule : public ExternalModule {
     };
 
     typedef std::map<String, ExternalFunction*, ltstr> FuncMap_t;
-
-    FuncMap_t theFunctions;
+    FuncMap_t lFunctions;
 
   public:
     JdbcModule() 
@@ -71,6 +83,10 @@ class JdbcModule : public ExternalModule {
 
     ~JdbcModule()
     {}
+
+
+    static jclass
+    getJavaClass(const JavaClasses idClass, JNIEnv *env);
 
     virtual String getURI() const
     { return JDBC_MODULE_NAMESPACE; }
@@ -102,8 +118,6 @@ class JdbcModule : public ExternalModule {
 
     static InstanceMap* 
       getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
-    static InstanceMap* 
-      getInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
     static jobject 
       getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
 

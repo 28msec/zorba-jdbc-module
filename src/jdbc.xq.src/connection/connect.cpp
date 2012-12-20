@@ -60,25 +60,25 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       lKeys->close();
     }
 
-    jmethodID mConnection;
+    if (cDriverManager==NULL) {
+      cDriverManager = JdbcModule::getJavaClass(JC_DRIVER_MANAGER, env);
+    }
+
     jobject oConnection;
-    jclass cDriverManager = env->FindClass("java/sql/DriverManager");
-    CHECK_EXCEPTION(env);
     if (hasUsername) {
-      mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
-      CHECK_EXCEPTION(env);
-      oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, url, username, password);
+      oConnection = env->CallStaticObjectMethod(cDriverManager, getConnectionWithCredentialsMethod(env), url, username, password);
       CHECK_EXCEPTION(env);
     } else {
-      mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;");
+      oConnection = env->CallStaticObjectMethod(cDriverManager, getConnectionMethod(env), url);
       CHECK_EXCEPTION(env);
-      oConnection = env->CallStaticObjectMethod(cDriverManager, mConnection, url);
-      CHECK_EXCEPTION(env);
+    }
+
+    if (cConnection==NULL) {
+      cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
     }
     item = JdbcModule::getItemArg(args, 1);
     if ((!item.isNull()) && (item.isJSONItem()))
     {
-      jclass cConnection = env->FindClass("java/sql/Connection");
       Iterator_t lKeys = item.getObjectKeys();
       lKeys->open();
       Item lKey;
@@ -90,18 +90,18 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
           if (item.getObjectValue(keystring).getBooleanValue()) {
             value = JNI_TRUE;
           }
-          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setAutoCommit", "(Z)V"), value);
+          env->CallVoidMethod(oConnection, getSetAutoCommitMethod(env), value);
           CHECK_EXCEPTION(env);
         } else if (keystring=="readonly") {
           jboolean value = JNI_FALSE;
           if (item.getObjectValue(keystring).getBooleanValue()) {
             value = JNI_TRUE;
           }
-          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setReadOnly", "(Z)V"), value);
+          env->CallVoidMethod(oConnection, getSetReadOnlyMethod(env), value);
           CHECK_EXCEPTION(env);
         } else if (keystring=="isolation-level") {
           jint isolationLevel = (int) item.getObjectValue(keystring).getLongValue();
-          env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "setTransactionIsolation", "(I)V"), isolationLevel);
+          env->CallVoidMethod(oConnection, getSetTransactionIsolationMethod(env), isolationLevel);
           CHECK_EXCEPTION(env);
         }
       }
@@ -116,5 +116,47 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JDBC_MODULE_CATCH
   return ItemSequence_t(new SingletonItemSequence(result));
 }
+
+jclass ConnectFunction::cDriverManager = NULL;
+jmethodID ConnectFunction::getConnectionMethod(JNIEnv *env) {
+  static jmethodID mConnection = NULL;
+  if (mConnection == NULL) {
+    mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;");
+  }
+  return mConnection;
+}
+jmethodID ConnectFunction::getConnectionWithCredentialsMethod(JNIEnv *env) {
+  static jmethodID mConnection = NULL;
+  if (mConnection == NULL) {
+    mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
+  }
+  return mConnection;
+}
+
+
+jclass ConnectFunction::cConnection = NULL;
+jmethodID ConnectFunction::getSetAutoCommitMethod(JNIEnv *env) {
+  static jmethodID mSetAutoCommit = NULL;
+  if (mSetAutoCommit == NULL) {
+    mSetAutoCommit = env->GetMethodID(cConnection, "setAutoCommit", "(Z)V");
+  }
+  return mSetAutoCommit;
+}
+jmethodID ConnectFunction::getSetReadOnlyMethod(JNIEnv *env) {
+  static jmethodID mSetReadOnly = NULL;
+  if (mSetReadOnly == NULL) {
+    mSetReadOnly = env->GetMethodID(cConnection, "setReadOnly", "(Z)V");
+  }
+  return mSetReadOnly;
+}
+jmethodID ConnectFunction::getSetTransactionIsolationMethod(JNIEnv *env) {
+  static jmethodID mSetTransactionIsolation = NULL;
+  if (mSetTransactionIsolation == NULL) {
+    mSetTransactionIsolation = env->GetMethodID(cConnection, "setTransactionIsolation", "(I)V");
+  }
+  return mSetTransactionIsolation;
+}
+
+
 
 }}; // namespace zorba, jdbc

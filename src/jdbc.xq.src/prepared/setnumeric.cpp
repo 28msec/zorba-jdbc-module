@@ -42,8 +42,7 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = env->FindClass("java/sql/PreparedStatement");
-    CHECK_EXCEPTION(env);
+    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
 
     switch (type) {
       case XS_DOUBLE:

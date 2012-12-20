@@ -59,15 +59,14 @@ namespace zorba
 namespace jdbc
 {
 
-
 zorba::ExternalFunction* 
 JdbcModule::getExternalFunction(const zorba::String& localName)
 {
-  FuncMap_t::iterator lIte = theFunctions.find(localName);
+  FuncMap_t::iterator lIte = lFunctions.find(localName);
 
-  ExternalFunction*& lFunc = theFunctions[localName];
+  ExternalFunction*& lFunc = lFunctions[localName];
 
-  if (lIte == theFunctions.end())
+  if (lIte == lFunctions.end())
   {
     // 2 CONNECTION HANDLING
     if (localName == "connect")
@@ -252,7 +251,7 @@ JdbcModule::getStringArg(const ExternalFunction::Arguments_t& args, int index) {
 Item
 JdbcModule::getItemArg(const ExternalFunction::Arguments_t& args, int index) {
   Item item;
-  if (index < args.size()) {
+  if (index < (int)args.size()) {
     Iterator_t lIter = args[index]->getIterator();
     lIter->open();
     lIter->next(item);
@@ -308,6 +307,50 @@ jobject
       }
     }
     return oResult;
+}
+
+
+jclass
+JdbcModule::getJavaClass(const JavaClasses idClass, JNIEnv *env)
+{
+  LOG("HERE with ID: " << idClass)
+  static JavaClassMap_t lJavaClasses;
+  JavaClassMap_t::iterator lIte = lJavaClasses.find(idClass);
+  jclass &lClass = lJavaClasses[idClass];
+  if (lIte == lJavaClasses.end())
+  {
+    LOG("RESOLVING")
+    JDBC_MODULE_TRY
+    switch (idClass)
+    {
+    case JC_DRIVER_MANAGER:
+      lClass = env->FindClass("java/sql/DriverManager");
+      break;
+    case JC_CONNECTION:
+      lClass = env->FindClass("java/sql/Connection");
+      break;
+    case JC_STATEMENT:
+      lClass = env->FindClass("java/sql/Statement");
+      break;
+    case JC_RESULT_SET:
+      lClass = env->FindClass("java/sql/ResultSet");
+      break;
+    case JC_RESULT_SET_METADATA:
+      lClass = env->FindClass("java/sql/ResultSetMetaData");
+      break;
+    case JC_PREPARED_STATEMEMT:
+      lClass = env->FindClass("java/sql/PreparedStatement");
+      break;
+    case JC_PARAMETER_META_DATA:
+      lClass = env->FindClass("java/sql/ParameterMetaData");
+      break;
+    default:
+      break;
+    }
+    CHECK_EXCEPTION(env);
+    JDBC_MODULE_CATCH
+  }
+    return lClass;
 }
 
 }}; // namespace zorba, jdbc

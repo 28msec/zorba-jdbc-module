@@ -31,10 +31,10 @@ namespace jdbc
     JDBC_MODULE_TRY
       itemFactory = Zorba::getInstance(0)->getItemFactory();
       SQLTypes::init(env);
-      cResultSet = env->FindClass("java/sql/ResultSet");
-      CHECK_EXCEPTION(env);
-      jclass cResultSetMetadata = env->FindClass("java/sql/ResultSetMetaData");
-      CHECK_EXCEPTION(env);
+
+      cResultSet = JdbcModule::getJavaClass(JC_RESULT_SET, env);
+      jclass cResultSetMetadata = JdbcModule::getJavaClass(JC_RESULT_SET_METADATA, env);
+
       oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "getMetaData", "()Ljava/sql/ResultSetMetaData;"));
       CHECK_EXCEPTION(env);
       columnCount = env->CallIntMethod(oMetadata, env->GetMethodID(cResultSetMetadata, "getColumnCount", "()I"));
@@ -97,15 +97,7 @@ namespace jdbc
       aItem = itemFactory->createJSONObject(elements);
       elements.clear();
       result = true;
-    }
-    catch (zorba::jvm::VMOpenException&)
-    {
-      JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?).");
-    }
-    catch (JavaException&)
-    {
-      JdbcModule::throwJavaException(env, lException);
-    }
+    JDBC_MODULE_CATCH
     return result;
   }
 

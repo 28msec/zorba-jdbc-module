@@ -34,27 +34,28 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
   JDBC_MODULE_TRY
     String lStatementUUID = JdbcModule::getStringArg(args, 0);
 
+    zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
+
     jobject oStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
-    zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
-    jclass cStatement = env->FindClass("java/sql/Statement");
-    CHECK_EXCEPTION(env);
-
-    int rowsAffected = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "getUpdateCount", "()I"));
+    if (cStatement==NULL) {
+      cStatement = JdbcModule::getJavaClass(JC_STATEMENT, env);
+    }
+    int rowsAffected = env->CallIntMethod(oStatement, getUpdateCountMethod(env));
     CHECK_EXCEPTION(env);
 
     if (rowsAffected==-1) { // NON UPDATE QUERY
-      jobject oResultSet = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;"));
+      jobject oResultSet = env->CallObjectMethod(oStatement, getResultSetMethod(env));
       CHECK_EXCEPTION(env);
 
-      jclass cResultSet = env->FindClass("java/sql/ResultSet");
-      CHECK_EXCEPTION(env);
-
-      jboolean hasRows = env->CallBooleanMethod(oResultSet, env->GetMethodID(cResultSet, "last", "()Z"));
+      if (cResultSet==NULL) {
+        cResultSet = JdbcModule::getJavaClass(JC_STATEMENT, env);
+      }
+      jboolean hasRows = env->CallBooleanMethod(oResultSet, getLastMethod(env));
       CHECK_EXCEPTION(env);
 
       if (hasRows==JNI_TRUE) {
-        rowsAffected = env->CallBooleanMethod(oResultSet, env->GetMethodID(cResultSet, "getRow", "()I"));
+        rowsAffected = env->CallBooleanMethod(oResultSet, getGetRowMethod(env));
         CHECK_EXCEPTION(env);
       } else {
         rowsAffected=0;
@@ -66,4 +67,35 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
   return ItemSequence_t(new SingletonItemSequence(result));
 }
 
+jclass AffectedRowsFunction::cStatement=NULL;
+jmethodID AffectedRowsFunction::getUpdateCountMethod(JNIEnv *env) {
+  static jmethodID mGetUpdateCount=NULL;
+  if (mGetUpdateCount==NULL) {
+    mGetUpdateCount = env->GetMethodID(cStatement, "getUpdateCount", "()I");
+  }
+  return mGetUpdateCount;
+}
+jmethodID AffectedRowsFunction::getResultSetMethod(JNIEnv *env) {
+  static jmethodID mResultSet=NULL;
+  if (mResultSet==NULL) {
+    mResultSet = env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;");
+  }
+  return mResultSet;
+}
+
+jclass AffectedRowsFunction::cResultSet=NULL;
+jmethodID AffectedRowsFunction::getLastMethod(JNIEnv *env) {
+  static jmethodID mLast=NULL;
+  if (mLast==NULL) {
+    mLast = env->GetMethodID(cResultSet, "last", "()Z");
+  }
+  return mLast;
+}
+jmethodID AffectedRowsFunction::getGetRowMethod(JNIEnv *env) {
+  static jmethodID mGetRow=NULL;
+  if (mGetRow==NULL) {
+    mGetRow = env->GetMethodID(cResultSet, "getRow", "()I");
+  }
+  return mGetRow;
+}
 }}; // namespace zorba, jdbc
