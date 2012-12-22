@@ -188,50 +188,37 @@ JdbcModule::throwError(const char *aLocalName, String aErrorMessage)
 void
 JdbcModule::throwJavaException(JNIEnv *env, jthrowable& lException)
 {
-  jclass stringWriterClass = env->FindClass("java/io/StringWriter");
-  jclass printWriterClass = env->FindClass("java/io/PrintWriter");
-  jclass throwableClass = env->FindClass("java/lang/Throwable");
-  jobject stringWriter = env->NewObject(
+  jclass stringWriterClass = JdbcModule::env->FindClass("java/io/StringWriter");
+  jclass printWriterClass = JdbcModule::env->FindClass("java/io/PrintWriter");
+  jclass throwableClass = JdbcModule::env->FindClass("java/lang/Throwable");
+  jobject stringWriter = JdbcModule::env->NewObject(
       stringWriterClass,
-      env->GetMethodID(stringWriterClass, "<init>", "()V"));
+      JdbcModule::env->GetMethodID(stringWriterClass, "<init>", "()V"));
 
-  jobject printWriter = env->NewObject(
+  jobject printWriter = JdbcModule::env->NewObject(
       printWriterClass,
-      env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
+      JdbcModule::env->GetMethodID(printWriterClass, "<init>", "(Ljava/io/Writer;)V"),
       stringWriter);
 
-  env->CallObjectMethod(lException,
-      env->GetMethodID(throwableClass, "printStackTrace",
+  JdbcModule::env->CallObjectMethod(lException,
+      JdbcModule::env->GetMethodID(throwableClass, "printStackTrace",
           "(Ljava/io/PrintWriter;)V"),
       printWriter);
 
-  //env->CallObjectMethod(printWriter, env->GetMethodID(printWriterClass, "flush", "()V"));
+  //env->CallObjectMethod(printWriter, JdbcModule::env->GetMethodID(printWriterClass, "flush", "()V"));
   jmethodID toStringMethod =
-    env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
-  jobject errorMessageObj = env->CallObjectMethod(
+    JdbcModule::env->GetMethodID(stringWriterClass, "toString", "()Ljava/lang/String;");
+  jobject errorMessageObj = JdbcModule::env->CallObjectMethod(
       stringWriter, toStringMethod);
   jstring errorMessage = (jstring) errorMessageObj;
-  const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
+  const char *errMsg = JdbcModule::env->GetStringUTFChars(errorMessage, 0);
   std::stringstream s;
   s << "A Java Exception was thrown:" << std::endl << errMsg;
-  env->ReleaseStringUTFChars(errorMessage, errMsg);
+  JdbcModule::env->ReleaseStringUTFChars(errorMessage, errMsg);
   std::string err("");
   err += s.str();
-  env->ExceptionClear();
+  JdbcModule::env->ExceptionClear();
   JdbcModule::throwError("JAVA-EXCEPTION", err);
-}
-
-
-JNIEnv* 
-JdbcModule::getJavaEnv(const zorba::StaticContext* aStaticContext) {
-  static JNIEnv* env;
-  if (env==NULL) {
-    JDBC_MODULE_TRY
-        env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
-        CHECK_EXCEPTION(env);
-    JDBC_MODULE_CATCH
-  }
-  return env;
 }
 
 String
@@ -309,49 +296,31 @@ jobject
     return oResult;
 }
 
-
-jclass
-JdbcModule::getJavaClass(const JavaClasses idClass, JNIEnv *env)
-{
-  LOG("HERE with ID: " << idClass)
-  static JavaClassMap_t lJavaClasses;
-  JavaClassMap_t::iterator lIte = lJavaClasses.find(idClass);
-  jclass &lClass = lJavaClasses[idClass];
-  if (lIte == lJavaClasses.end())
-  {
-    LOG("RESOLVING")
-    JDBC_MODULE_TRY
-    switch (idClass)
-    {
-    case JC_DRIVER_MANAGER:
-      lClass = env->FindClass("java/sql/DriverManager");
-      break;
-    case JC_CONNECTION:
-      lClass = env->FindClass("java/sql/Connection");
-      break;
-    case JC_STATEMENT:
-      lClass = env->FindClass("java/sql/Statement");
-      break;
-    case JC_RESULT_SET:
-      lClass = env->FindClass("java/sql/ResultSet");
-      break;
-    case JC_RESULT_SET_METADATA:
-      lClass = env->FindClass("java/sql/ResultSetMetaData");
-      break;
-    case JC_PREPARED_STATEMEMT:
-      lClass = env->FindClass("java/sql/PreparedStatement");
-      break;
-    case JC_PARAMETER_META_DATA:
-      lClass = env->FindClass("java/sql/ParameterMetaData");
-      break;
-    default:
-      break;
-    }
-    CHECK_EXCEPTION(env);
-    JDBC_MODULE_CATCH
-  }
-    return lClass;
+void JdbcModule::init(const zorba::StaticContext* aStaticContext) {
+  if (env!=NULL) 
+    return;
+  JDBC_MODULE_TRY
+    env = zorba::jvm::JavaVMSingleton::getInstance(aStaticContext)->getEnv();
+    CHECK_EXCEPTION
+    JdbcModule::jDriverManager.init();
+    JdbcModule::jConnection.init();
+    JdbcModule::jStatement.init();
+    JdbcModule::jResultSet.init();
+    JdbcModule::jResultSetMetadata.init();
+    JdbcModule::jPreparedStatement.init();
+    JdbcModule::jParameterMetadata.init();
+    SQLTypes::init();
+  JDBC_MODULE_CATCH
 }
+
+JNIEnv* JdbcModule::env;
+JavaDriverManager JdbcModule::jDriverManager;
+JavaConnection JdbcModule::jConnection;
+JavaStatement JdbcModule::jStatement;
+JavaResultSet JdbcModule::jResultSet;
+JavaResultSetMetadata JdbcModule::jResultSetMetadata;
+JavaPreparedStatement JdbcModule::jPreparedStatement;
+JavaParameterMetadata JdbcModule::jParameterMetadata;
 
 }}; // namespace zorba, jdbc
 

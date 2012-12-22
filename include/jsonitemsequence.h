@@ -34,22 +34,16 @@ namespace jdbc
       {
         protected:
           bool itOpen;
-          jclass cResultSet;
           jobject oResultSet;
-          JNIEnv* env;
           String* columnNames;
           long* columnTypes;
           long columnCount;
           zorba::ItemFactory* itemFactory;
           jobject oMetadata;
-          jmethodID mNext;
-          jmethodID mGetInt;
-          jmethodID mGetDouble;
-          jmethodID mGetString;
 
         public:
-          JSONIterator(jobject resultSet, JNIEnv* env):
-            itOpen(false), oResultSet(resultSet),env(env),columnNames(NULL),columnCount(0), oMetadata(NULL) {}
+          JSONIterator(jobject resultSet):
+            itOpen(false), oResultSet(resultSet),columnNames(NULL),columnCount(0), oMetadata(NULL) {}
 
           virtual ~JSONIterator() {
           }
@@ -69,17 +63,16 @@ namespace jdbc
 
     protected:
       jobject resultSet;
-      JNIEnv* env;
 
     public:
-      JSONItemSequence(jobject resultSet, JNIEnv* env)
-        : resultSet(resultSet), env(env)
+      JSONItemSequence(jobject resultSet)
+        : resultSet(resultSet)
       {}
 
       virtual ~JSONItemSequence() {}
 
       zorba::Iterator_t 
-        getIterator() { return new JSONIterator(resultSet, env); }
+        getIterator() { return new JSONIterator(resultSet); }
   };
 
 }}; // namespace zorba, jdbc

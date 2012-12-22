@@ -34,13 +34,6 @@ class AffectedRowsFunction : public ContextualExternalFunction
     ItemFactory* theFactory;
     XmlDataManager* theDataManager;
 
-    static jclass cStatement;
-    static jmethodID getUpdateCountMethod(JNIEnv *env);
-    static jmethodID getResultSetMethod(JNIEnv *env);
-    static jclass cResultSet;
-    static jmethodID getLastMethod(JNIEnv *env);
-    static jmethodID getGetRowMethod(JNIEnv *env);
-
   public:
     AffectedRowsFunction(const ExternalModule* aModule) :
       theModule(aModule),

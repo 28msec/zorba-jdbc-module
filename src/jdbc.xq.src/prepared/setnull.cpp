@@ -28,7 +28,7 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -36,19 +36,19 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
 
-    jobject oParameterMetadata = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;"));
-    CHECK_EXCEPTION(env);
+    jobject oParameterMetadata = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getParameterMetaData);
+    CHECK_EXCEPTION
 
-    jclass cParameterMetaData = JdbcModule::getJavaClass(JC_PARAMETER_META_DATA, env);
+    jclass cParameterMetaData = JdbcModule::jParameterMetadata.classID;
 
     long index = (long)JdbcModule::getItemArg(args, 1).getLongValue();
-    int parameterType = env->CallIntMethod(oParameterMetadata, env->GetMethodID(cParameterMetaData, "getParameterType", "(I)I"), index);
-    CHECK_EXCEPTION(env);
+    int parameterType = JdbcModule::env->CallIntMethod(oParameterMetadata, JdbcModule::jParameterMetadata.getParameterType, index);
+    CHECK_EXCEPTION
 
-    env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setNull", "(II)V"), index, parameterType);
-    CHECK_EXCEPTION(env);
+      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setNull, index, parameterType);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

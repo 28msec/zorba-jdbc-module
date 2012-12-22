@@ -30,7 +30,7 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -42,17 +42,17 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
 
     if (type == XS_BOOLEAN) {
       jboolean val = JNI_FALSE;
       if (value.getBooleanValue())
         val = JNI_TRUE;
-      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setBoolean", "(IZ)V"), index, val);
+      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setBoolean, index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting boolean value.");
     }
-    CHECK_EXCEPTION(env);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

@@ -28,7 +28,7 @@ ClearParamsFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -36,19 +36,8 @@ ClearParamsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    static jclass cPreparedStatement = NULL;
-    if (cPreparedStatement==NULL) {
-      cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
-    }
-
-    static jmethodID mClearParams = NULL;
-    if (mClearParams==NULL) {
-      mClearParams = env->GetMethodID(cPreparedStatement, "clearParameters", "()V");
-      CHECK_EXCEPTION(env);
-    }
-
-    env->CallVoidMethod(oPreparedStatement, mClearParams);
-    CHECK_EXCEPTION(env);
+    JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.clearParameters);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

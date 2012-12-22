@@ -29,7 +29,7 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -39,45 +39,37 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
 
-    jclass cStatement = JdbcModule::getJavaClass(JC_STATEMENT, env);
-
-    int rowsAffected = env->CallIntMethod(oStatement, env->GetMethodID(cStatement, "getUpdateCount", "()I"));
-    CHECK_EXCEPTION(env);
+    int rowsAffected = JdbcModule::env->CallIntMethod(oStatement, JdbcModule::jStatement.getUpdateCount);
+    CHECK_EXCEPTION
 
     std::vector<std::pair<zorba::Item, zorba::Item> > vResult;
     if (rowsAffected==-1) { // NON UPDATE QUERY
-      jobject oResultSet = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "getResultSet", "()Ljava/sql/ResultSet;"));
-      CHECK_EXCEPTION(env);
+      jobject oResultSet = JdbcModule::env->CallObjectMethod(oStatement, JdbcModule::jStatement.getResultSet);
+      CHECK_EXCEPTION
 
-      jclass cResultSet = JdbcModule::getJavaClass(JC_RESULT_SET, env);
+      jobject oMetadata = JdbcModule::env->CallObjectMethod(oResultSet, JdbcModule::jResultSet.getMetaData);
+      CHECK_EXCEPTION
 
-      jobject oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "getMetaData", "()Ljava/sql/ResultSetMetaData;"));
-      CHECK_EXCEPTION(env);
+      int columns = JdbcModule::env->CallIntMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnCount);
+      CHECK_EXCEPTION
 
-      jclass cResultSetMetaData = JdbcModule::getJavaClass(JC_RESULT_SET_METADATA, env);
-
-      int columns = env->CallIntMethod(oResultSet, env->GetMethodID(cResultSet, "getColumnCount", "()I"));
-      CHECK_EXCEPTION(env);
-
-      jmethodID mType = env->GetMethodID(cResultSetMetaData, "getColumnTypeName", "(I)Ljava/lang/String;");
-      jmethodID mName = env->GetMethodID(cResultSetMetaData, "getColumnName",     "(I)Ljava/lang/String;");
       std::vector<zorba::Item> elements;
 
       for (int i=1; i<=columns; i++) {
           std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
-          jstring oName = (jstring) env->CallObjectMethod(oMetadata, mName, i);
-          CHECK_EXCEPTION(env);
-          String sName = env->GetStringUTFChars(oName, NULL);
-          CHECK_EXCEPTION(env);
+          jstring oName = (jstring) JdbcModule::env->CallObjectMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnName, i);
+          CHECK_EXCEPTION
+          String sName = JdbcModule::env->GetStringUTFChars(oName, NULL);
+          CHECK_EXCEPTION
           zorba::Item iName = itemFactory->createString(sName);
           std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
           column.push_back(pName);
 
-          jstring oType = (jstring) env->CallObjectMethod(oMetadata, mType, i);
-          CHECK_EXCEPTION(env);
-          String  sType = env->GetStringUTFChars(oType, NULL);
-          CHECK_EXCEPTION(env); 
+          jstring oType = (jstring) JdbcModule::env->CallObjectMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnTypeName, i);
+          CHECK_EXCEPTION
+          String  sType = JdbcModule::env->GetStringUTFChars(oType, NULL);
+          CHECK_EXCEPTION 
           zorba::Item iType = itemFactory->createString(sType);
           std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
           column.push_back(pType);

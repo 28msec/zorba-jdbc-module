@@ -23,41 +23,31 @@ namespace zorba
 {
 namespace jdbc
 {
-
   void JSONItemSequence::JSONIterator::open(){
     if(oResultSet == NULL)
       return;
 
     JDBC_MODULE_TRY
       itemFactory = Zorba::getInstance(0)->getItemFactory();
-      SQLTypes::init(env);
 
-      cResultSet = JdbcModule::getJavaClass(JC_RESULT_SET, env);
-      jclass cResultSetMetadata = JdbcModule::getJavaClass(JC_RESULT_SET_METADATA, env);
+      oMetadata = JdbcModule::env->CallObjectMethod(oResultSet, JdbcModule::jResultSet.getMetaData);
+      CHECK_EXCEPTION
+      columnCount = JdbcModule::env->CallIntMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnCount);
+      CHECK_EXCEPTION
+      JdbcModule::env->CallVoidMethod(oResultSet, JdbcModule::jResultSet.beforeFirst);
+      CHECK_EXCEPTION
 
-      oMetadata = env->CallObjectMethod(oResultSet, env->GetMethodID(cResultSet, "getMetaData", "()Ljava/sql/ResultSetMetaData;"));
-      CHECK_EXCEPTION(env);
-      columnCount = env->CallIntMethod(oMetadata, env->GetMethodID(cResultSetMetadata, "getColumnCount", "()I"));
-      CHECK_EXCEPTION(env);
-      env->CallVoidMethod(oResultSet, env->GetMethodID(cResultSet, "beforeFirst", "()V"));
-      CHECK_EXCEPTION(env);
       // Getting column names and types
-      jmethodID mColumnType = env->GetMethodID(cResultSetMetadata, "getColumnType", "(I)I");
-      jmethodID mColumnName = env->GetMethodID(cResultSetMetadata, "getColumnName", "(I)Ljava/lang/String;");
       columnNames = new String[columnCount];
       columnTypes = new long[columnCount];
       for(int i=0; i<columnCount; i++){
-        jstring oName = (jstring) env->CallObjectMethod(oMetadata, mColumnName, i+1);
-        CHECK_EXCEPTION(env);
-        columnNames[i] = env->GetStringUTFChars(oName, NULL);
-        CHECK_EXCEPTION(env);
-        columnTypes[i] = env->CallIntMethod(oMetadata, mColumnType, i+1);
-        CHECK_EXCEPTION(env);
+        jstring oName = (jstring) JdbcModule::env->CallObjectMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnName, i+1);
+        CHECK_EXCEPTION
+        columnNames[i] = JdbcModule::env->GetStringUTFChars(oName, NULL);
+        CHECK_EXCEPTION
+        columnTypes[i] = JdbcModule::env->CallIntMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnType, i+1);
+        CHECK_EXCEPTION
       }
-      mNext = env->GetMethodID(cResultSet, "next", "()Z");
-      mGetInt = env->GetMethodID(cResultSet, "getInt", "(I)I");
-      mGetDouble = env->GetMethodID(cResultSet, "getDouble", "(I)D");
-      mGetString = env->GetMethodID(cResultSet, "getString", "(I)Ljava/lang/String;");
     JDBC_MODULE_CATCH
     itOpen=true;
   }
@@ -68,8 +58,8 @@ namespace jdbc
       return result;
 
     JDBC_MODULE_TRY
-      jboolean hasNext = env->CallBooleanMethod(oResultSet, mNext);
-      CHECK_EXCEPTION(env);
+      jboolean hasNext = JdbcModule::env->CallBooleanMethod(oResultSet, JdbcModule::jResultSet.next);
+      CHECK_EXCEPTION
       if (hasNext == JNI_FALSE)
         return result;
 
@@ -78,18 +68,18 @@ namespace jdbc
         zorba::Item aKey = itemFactory->createString(columnNames[i]);
         zorba::Item aValue;
         if (SQLTypes::isInt(columnTypes[i])) {
-          int value = env->CallIntMethod(oResultSet, mGetInt, i+1);
-          CHECK_EXCEPTION(env);
+          int value = JdbcModule::env->CallIntMethod(oResultSet, JdbcModule::jResultSet.getInt, i+1);
+          CHECK_EXCEPTION
           aValue = itemFactory->createInt(value);
         } else if (SQLTypes::isFloat(columnTypes[i])) {
-          double value = env->CallDoubleMethod(oResultSet, mGetDouble, i+1);
-          CHECK_EXCEPTION(env);
+          double value = JdbcModule::env->CallDoubleMethod(oResultSet, JdbcModule::jResultSet.getDouble, i+1);
+          CHECK_EXCEPTION
           aValue = itemFactory->createDouble(value);
         } else {
-          jstring sValue = (jstring) env->CallObjectMethod(oResultSet, mGetString, i+1);
-          CHECK_EXCEPTION(env);
-          const char *value = env->GetStringUTFChars(sValue, NULL);
-          CHECK_EXCEPTION(env);
+          jstring sValue = (jstring) JdbcModule::env->CallObjectMethod(oResultSet, JdbcModule::jResultSet.getString, i+1);
+          CHECK_EXCEPTION
+          const char *value = JdbcModule::env->GetStringUTFChars(sValue, NULL);
+          CHECK_EXCEPTION
           aValue = itemFactory->createString(zorba::String(value));
         }
         elements.push_back(std::pair<zorba::Item, zorba::Item>(aKey, aValue));

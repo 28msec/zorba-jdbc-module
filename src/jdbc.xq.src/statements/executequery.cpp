@@ -29,7 +29,7 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   jobject result=NULL;
 
   JDBC_MODULE_TRY
@@ -38,19 +38,16 @@ ExecuteQueryFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
+    jobject oStatement = JdbcModule::env->CallObjectMethod(oConnection, JdbcModule::jConnection.createStatement);
+    CHECK_EXCEPTION
 
-    jobject oStatement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
-    CHECK_EXCEPTION(env);
-
-    jclass cStatement = JdbcModule::getJavaClass(JC_STATEMENT, env);
-    jstring query =  env->NewStringUTF(lQuery.c_str());
-    result = env->CallObjectMethod(oStatement, env->GetMethodID(cStatement, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;"), query);
-    CHECK_EXCEPTION(env);
+    jstring query =  JdbcModule::env->NewStringUTF(lQuery.c_str());
+    result = JdbcModule::env->CallObjectMethod(oStatement, JdbcModule::jStatement.executeQuery, query);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   
-  return ItemSequence_t(new JSONItemSequence(result, env));
+  return ItemSequence_t(new JSONItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc

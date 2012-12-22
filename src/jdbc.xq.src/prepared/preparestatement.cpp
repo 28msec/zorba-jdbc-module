@@ -29,7 +29,6 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
   Item result;
   
   JDBC_MODULE_TRY
@@ -38,10 +37,10 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-    jstring query =  env->NewStringUTF(lQuery.c_str());
-    jobject oPrepared = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;"), query);
-    CHECK_EXCEPTION(env);
+    jclass cConnection = JdbcModule::jConnection.classID;
+    jstring query =  JdbcModule::env->NewStringUTF(lQuery.c_str());
+    jobject oPrepared = JdbcModule::env->CallObjectMethod(oConnection, JdbcModule::jConnection.prepareStatement, query);
+    CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);
     String resultUUID = JdbcModule::getUUID();

@@ -33,8 +33,6 @@ class ConnectFunction : public ContextualExternalFunction
     const ExternalModule* theModule;
     ItemFactory* theFactory;
     XmlDataManager* theDataManager;
-    static jclass cConnection;
-    static jclass cDriverManager;
 
   public:
     ConnectFunction(const ExternalModule* aModule) :
@@ -57,12 +55,6 @@ class ConnectFunction : public ContextualExternalFunction
       evaluate(const ExternalFunction::Arguments_t& args,
                const zorba::StaticContext*,
                const zorba::DynamicContext*) const;
-    
-    static jmethodID getSetAutoCommitMethod(JNIEnv *env);
-    static jmethodID getConnectionMethod(JNIEnv *env);
-    static jmethodID getConnectionWithCredentialsMethod(JNIEnv *env);
-    static jmethodID getSetReadOnlyMethod(JNIEnv *env);
-    static jmethodID getSetTransactionIsolationMethod(JNIEnv *env);
 };
 
 

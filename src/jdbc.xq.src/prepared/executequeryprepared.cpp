@@ -29,7 +29,7 @@ ExecuteQueryPreparedFunction::evaluate(const ExternalFunction::Arguments_t& args
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   jobject result=NULL;
 
   JDBC_MODULE_TRY
@@ -37,14 +37,12 @@ ExecuteQueryPreparedFunction::evaluate(const ExternalFunction::Arguments_t& args
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
-
-    result = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "executeQuery", "()Ljava/sql/ResultSet;"));
-    CHECK_EXCEPTION(env);
+    result = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.executeQuery);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   
-  return ItemSequence_t(new JSONItemSequence(result, env));
+  return ItemSequence_t(new JSONItemSequence(result));
 }
 
 }}; // namespace zorba, jdbc

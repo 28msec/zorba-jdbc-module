@@ -29,7 +29,7 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -38,16 +38,12 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
+    jobject oStatement = JdbcModule::env->CallObjectMethod(oConnection, JdbcModule::jConnection.createStatement);
+    CHECK_EXCEPTION
 
-    jobject oStatement = env->CallObjectMethod(oConnection, env->GetMethodID(cConnection, "createStatement", "()Ljava/sql/Statement;"));
-    CHECK_EXCEPTION(env);
-
-    jclass cStatement = JdbcModule::getJavaClass(JC_STATEMENT, env);
-
-    jstring query =  env->NewStringUTF(lQuery.c_str());
-    env->CallBooleanMethod(oStatement, env->GetMethodID(cStatement, "execute", "(Ljava/lang/String;)Z"), query);
-    CHECK_EXCEPTION(env);
+    jstring query =  JdbcModule::env->NewStringUTF(lQuery.c_str());
+    JdbcModule::env->CallBooleanMethod(oStatement, JdbcModule::jStatement.execute, query);
+    CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
     String resultUUID = JdbcModule::getUUID();

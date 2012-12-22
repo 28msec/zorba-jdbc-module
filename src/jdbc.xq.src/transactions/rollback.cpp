@@ -28,16 +28,16 @@ RollbackFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
 
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-    env->CallVoidMethod(oConnection, env->GetMethodID(cConnection, "rollback", "()V"));
-    CHECK_EXCEPTION(env);
+    jclass cConnection = JdbcModule::jConnection.classID;
+    JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.rollback);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

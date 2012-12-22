@@ -28,7 +28,7 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
   JDBC_MODULE_TRY
     jstring url(NULL), username(NULL), password(NULL);
@@ -44,15 +44,15 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
         zorba::String keystring = lKey.getStringValue();
         zorba::String value = item.getObjectValue(keystring).getStringValue();
         if (keystring=="url") {
-          url =  env->NewStringUTF(value.c_str());
-          CHECK_EXCEPTION(env);
+          url =  JdbcModule::env->NewStringUTF(value.c_str());
+          CHECK_EXCEPTION
         } else if (keystring=="user") {
-          username =  env->NewStringUTF(value.c_str());
-          CHECK_EXCEPTION(env);
+          username =  JdbcModule::env->NewStringUTF(value.c_str());
+          CHECK_EXCEPTION
           hasUsername = true;
         } else if (keystring=="password") {
-          password =  env->NewStringUTF(value.c_str());
-          CHECK_EXCEPTION(env);
+          password =  JdbcModule::env->NewStringUTF(value.c_str());
+          CHECK_EXCEPTION
         } else if (keystring.compare("type")) {
         } else if (keystring.compare("driver")) {
         }
@@ -60,22 +60,15 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
       lKeys->close();
     }
 
-    if (cDriverManager==NULL) {
-      cDriverManager = JdbcModule::getJavaClass(JC_DRIVER_MANAGER, env);
-    }
-
     jobject oConnection;
     if (hasUsername) {
-      oConnection = env->CallStaticObjectMethod(cDriverManager, getConnectionWithCredentialsMethod(env), url, username, password);
-      CHECK_EXCEPTION(env);
+      oConnection = JdbcModule::env->CallStaticObjectMethod(JdbcModule::jDriverManager.classID, JdbcModule::jDriverManager.getConnectionWithUser, url, username, password);
+      CHECK_EXCEPTION
     } else {
-      oConnection = env->CallStaticObjectMethod(cDriverManager, getConnectionMethod(env), url);
-      CHECK_EXCEPTION(env);
+      oConnection = JdbcModule::env->CallStaticObjectMethod(JdbcModule::jDriverManager.classID, JdbcModule::jDriverManager.getConnection, url);
+      CHECK_EXCEPTION
     }
 
-    if (cConnection==NULL) {
-      cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-    }
     item = JdbcModule::getItemArg(args, 1);
     if ((!item.isNull()) && (item.isJSONItem()))
     {
@@ -90,19 +83,19 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
           if (item.getObjectValue(keystring).getBooleanValue()) {
             value = JNI_TRUE;
           }
-          env->CallVoidMethod(oConnection, getSetAutoCommitMethod(env), value);
-          CHECK_EXCEPTION(env);
+          JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.setAutoCommit, value);
+          CHECK_EXCEPTION
         } else if (keystring=="readonly") {
           jboolean value = JNI_FALSE;
           if (item.getObjectValue(keystring).getBooleanValue()) {
             value = JNI_TRUE;
           }
-          env->CallVoidMethod(oConnection, getSetReadOnlyMethod(env), value);
-          CHECK_EXCEPTION(env);
+          JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.setReadOnly, value);
+          CHECK_EXCEPTION
         } else if (keystring=="isolation-level") {
           jint isolationLevel = (int) item.getObjectValue(keystring).getLongValue();
-          env->CallVoidMethod(oConnection, getSetTransactionIsolationMethod(env), isolationLevel);
-          CHECK_EXCEPTION(env);
+          JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.setTransactionIsolation, isolationLevel);
+          CHECK_EXCEPTION
         }
       }
       lKeys->close();
@@ -115,46 +108,6 @@ ConnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
     result = theFactory->createAnyURI(lStrUUID);
   JDBC_MODULE_CATCH
   return ItemSequence_t(new SingletonItemSequence(result));
-}
-
-jclass ConnectFunction::cDriverManager = NULL;
-jmethodID ConnectFunction::getConnectionMethod(JNIEnv *env) {
-  static jmethodID mConnection = NULL;
-  if (mConnection == NULL) {
-    mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;");
-  }
-  return mConnection;
-}
-jmethodID ConnectFunction::getConnectionWithCredentialsMethod(JNIEnv *env) {
-  static jmethodID mConnection = NULL;
-  if (mConnection == NULL) {
-    mConnection = env->GetStaticMethodID(cDriverManager, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
-  }
-  return mConnection;
-}
-
-
-jclass ConnectFunction::cConnection = NULL;
-jmethodID ConnectFunction::getSetAutoCommitMethod(JNIEnv *env) {
-  static jmethodID mSetAutoCommit = NULL;
-  if (mSetAutoCommit == NULL) {
-    mSetAutoCommit = env->GetMethodID(cConnection, "setAutoCommit", "(Z)V");
-  }
-  return mSetAutoCommit;
-}
-jmethodID ConnectFunction::getSetReadOnlyMethod(JNIEnv *env) {
-  static jmethodID mSetReadOnly = NULL;
-  if (mSetReadOnly == NULL) {
-    mSetReadOnly = env->GetMethodID(cConnection, "setReadOnly", "(Z)V");
-  }
-  return mSetReadOnly;
-}
-jmethodID ConnectFunction::getSetTransactionIsolationMethod(JNIEnv *env) {
-  static jmethodID mSetTransactionIsolation = NULL;
-  if (mSetTransactionIsolation == NULL) {
-    mSetTransactionIsolation = env->GetMethodID(cConnection, "setTransactionIsolation", "(I)V");
-  }
-  return mSetTransactionIsolation;
 }
 
 

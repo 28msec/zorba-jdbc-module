@@ -29,7 +29,7 @@ ExecutePreparedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
   
   JDBC_MODULE_TRY
@@ -37,10 +37,8 @@ ExecutePreparedFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
-
-    env->CallBooleanMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "execute", "()Z"));
-    CHECK_EXCEPTION(env);
+    JdbcModule::env->CallBooleanMethod(oPreparedStatement, JdbcModule::jPreparedStatement.execute);
+    CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);
     String resultUUID = JdbcModule::getUUID();

@@ -28,26 +28,15 @@ CommitFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
 
   JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    static jclass cConnection = NULL;
-    if (cConnection == NULL) {
-      cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-    }
-
-    static jmethodID mCommit = NULL;
-    if (mCommit==NULL) {
-      mCommit = env->GetMethodID(cConnection, "commit", "()V");
-      CHECK_EXCEPTION(env);
-    }
-
-    env->CallVoidMethod(oConnection, mCommit);
-    CHECK_EXCEPTION(env);
+    JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.commit);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

@@ -28,7 +28,7 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   jboolean isClosed;
 
 
@@ -37,12 +37,8 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-
-    jmethodID mIsClosed = env->GetMethodID(cConnection, "isClosed", "()Z");
-    CHECK_EXCEPTION(env);
-    isClosed = env->CallBooleanMethod(oConnection, mIsClosed);
-    CHECK_EXCEPTION(env);
+    isClosed = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.isClosed);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

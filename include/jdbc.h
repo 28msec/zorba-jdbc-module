@@ -18,8 +18,9 @@
 #include <zorba/external_module.h>
 #include <zorba/util/uuid.h>
 #include "instancemap.h"
-
+#include "javaids.h"
 #include "JavaVMSingleton.h"
+#include "sqltypes.h"
 
 #define JDBC_MODULE_NAMESPACE "http://www.zorba-xquery.com/modules/jdbc"
 
@@ -29,12 +30,12 @@
 
 class JavaException {};
 
-#define CHECK_EXCEPTION(env)  if ((lException = env->ExceptionOccurred())) throw JavaException()
+#define CHECK_EXCEPTION  if ((lException = JdbcModule::env->ExceptionOccurred())) throw JavaException();
 #define JDBC_MODULE_TRY  jthrowable lException = 0;  try   {
 #define JDBC_MODULE_CATCH   }  catch (zorba::jvm::VMOpenException&)  { \
                               JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?)."); \
                             }  catch (JavaException&)  { \
-                               JdbcModule::throwJavaException(env, lException); \
+                               JdbcModule::throwJavaException(JdbcModule::env, lException); \
                             }
 
 #define LOG_ACTIVE
@@ -48,19 +49,6 @@ namespace zorba
 {
 namespace jdbc
 {
-
-
-enum JavaClasses {
-  JC_DRIVER_MANAGER,
-  JC_CONNECTION,
-  JC_STATEMENT,
-  JC_RESULT_SET,
-  JC_RESULT_SET_METADATA,
-  JC_PREPARED_STATEMEMT,
-  JC_PARAMETER_META_DATA
-};
-
-typedef std::map<JavaClasses, jclass> JavaClassMap_t;
 
 class JdbcModule : public ExternalModule {
   protected:
@@ -78,15 +66,19 @@ class JdbcModule : public ExternalModule {
 
   public:
     JdbcModule() 
-    {
-    }
+    {};
 
     ~JdbcModule()
-    {}
+    {};
 
-
-    static jclass
-    getJavaClass(const JavaClasses idClass, JNIEnv *env);
+    static JNIEnv* env;
+    static JavaDriverManager     jDriverManager;
+    static JavaConnection        jConnection;
+    static JavaStatement         jStatement;
+    static JavaResultSet         jResultSet;
+    static JavaResultSetMetadata jResultSetMetadata;
+    static JavaPreparedStatement jPreparedStatement;
+    static JavaParameterMetadata jParameterMetadata;
 
     virtual String getURI() const
     { return JDBC_MODULE_NAMESPACE; }
@@ -97,8 +89,6 @@ class JdbcModule : public ExternalModule {
     {
       delete this;
     }
-
-    static JNIEnv* getJavaEnv(const zorba::StaticContext* aStaticContext);
 
     static String 
       getStringArg(const ExternalFunction::Arguments_t& args, int index);
@@ -121,8 +111,9 @@ class JdbcModule : public ExternalModule {
     static jobject 
       getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
 
-};
+    static void init(const zorba::StaticContext* aStaticContext);
 
+};
 
 }}; // namespace zorba, jdbc
 

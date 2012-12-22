@@ -30,7 +30,7 @@ ItemSequence_t
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -42,14 +42,14 @@ ItemSequence_t
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
     if (type == XS_STRING) {
-      jstring val =  env->NewStringUTF(value.getStringValue().c_str());
-      env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setString", "(ILjava/lang/String;)V"), index, val);
+      jstring val =  JdbcModule::env->NewStringUTF(value.getStringValue().c_str());
+      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setString, index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting string value.");
     }
-    CHECK_EXCEPTION(env);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

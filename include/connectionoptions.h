@@ -34,15 +34,6 @@ class ConnectionOptionsFunction : public ContextualExternalFunction
     ItemFactory* theFactory;
     XmlDataManager* theDataManager;
 
-    static jclass cConnection;
-    static jmethodID getAutoCommit(JNIEnv *env);
-    static jmethodID isReadOnly(JNIEnv *env);
-    static jfieldID T_NONE(JNIEnv *env);
-    static jfieldID T_UNCOMMITTED(JNIEnv *env);
-    static jfieldID T_COMMITTED(JNIEnv *env);
-    static jfieldID T_REPEATABLE(JNIEnv *env);
-    static jfieldID T_SERIALIZABLE(JNIEnv *env);
-    static jmethodID getTransactionIsolation(JNIEnv *env);
   public:
 
     ConnectionOptionsFunction(const ExternalModule* aModule) :

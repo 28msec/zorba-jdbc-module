@@ -30,7 +30,7 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -42,28 +42,28 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
 
     switch (type) {
       case XS_DOUBLE:
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index, value.getDoubleValue());
+        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setDouble, index, value.getDoubleValue());
       break;
       case XS_FLOAT:
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setFloat", "(IF)V"), index, value.getDoubleValue());
+        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setFloat, index, value.getDoubleValue());
       break;
       case XS_INTEGER:
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setLong", "(IJ)V"), index, value.getLongValue());
+        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setLong, index, value.getLongValue());
       break;
       case XS_DECIMAL:
         double dVal;
         sscanf(value.getStringValue().c_str(), "%lf", &dVal);
-        env->CallVoidMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "setDouble", "(ID)V"), index,  dVal);
+        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setDouble, index,  dVal);
       break;
       default:
         JdbcModule::throwError("SQL004", "Error setting numeric value.");
       break;
     }
-    CHECK_EXCEPTION(env);
+    CHECK_EXCEPTION
   JDBC_MODULE_CATCH
   
   return ItemSequence_t(new EmptySequence());

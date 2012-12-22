@@ -29,7 +29,7 @@ ExecuteUpdatePreparedFunction::evaluate(const ExternalFunction::Arguments_t& arg
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -37,10 +37,8 @@ ExecuteUpdatePreparedFunction::evaluate(const ExternalFunction::Arguments_t& arg
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
-
-    int rowCount = env->CallIntMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "executeUpdate", "()I"));
-    CHECK_EXCEPTION(env);
+    int rowCount = JdbcModule::env->CallIntMethod(oPreparedStatement, JdbcModule::jPreparedStatement.executeUpdate);
+    CHECK_EXCEPTION
 
     result = theFactory->createInteger(rowCount);
   JDBC_MODULE_CATCH

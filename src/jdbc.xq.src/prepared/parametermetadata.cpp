@@ -29,7 +29,7 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
   Item result;
 
   JDBC_MODULE_TRY
@@ -37,36 +37,30 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::getJavaClass(JC_PREPARED_STATEMEMT, env);
+    jobject oParameterMetaData = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getParameterMetaData);
+    CHECK_EXCEPTION
 
-    jobject oParameterMetaData = env->CallObjectMethod(oPreparedStatement, env->GetMethodID(cPreparedStatement, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;"));
-    CHECK_EXCEPTION(env);
-
-    jclass cParameterMetaData = JdbcModule::getJavaClass(JC_PARAMETER_META_DATA, env);
-
-    int columns = env->CallIntMethod(oParameterMetaData, env->GetMethodID(cParameterMetaData, "getParameterCount", "()I"));
-    CHECK_EXCEPTION(env);
+    int columns = JdbcModule::env->CallIntMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterCount);
+    CHECK_EXCEPTION
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
-    jmethodID mParameterType = env->GetMethodID(cParameterMetaData, "getParameterTypeName",  "(I)Ljava/lang/String;");
-    jmethodID mParameterName = env->GetMethodID(cParameterMetaData, "getParameterClassName", "(I)Ljava/lang/String;");
     std::vector<zorba::Item> elements;
 
     for (int i=1; i<=columns; i++) {
         std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
-        jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterName, i);
-        CHECK_EXCEPTION(env);
-        String sName = env->GetStringUTFChars(oName, NULL);
-        CHECK_EXCEPTION(env);
+        jstring oName = (jstring) JdbcModule::env->CallObjectMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterClassName, i);
+        CHECK_EXCEPTION
+        String sName = JdbcModule::env->GetStringUTFChars(oName, NULL);
+        CHECK_EXCEPTION
         zorba::Item iName = itemFactory->createString(sName);
         std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
         column.push_back(pName);
 
-        jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, mParameterType, i);
-        CHECK_EXCEPTION(env);
-        String  sType = env->GetStringUTFChars(oType, NULL);
-        CHECK_EXCEPTION(env); 
+        jstring oType = (jstring) JdbcModule::env->CallObjectMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterTypeName, i);
+        CHECK_EXCEPTION
+        String  sType = JdbcModule::env->GetStringUTFChars(oType, NULL);
+        CHECK_EXCEPTION 
         zorba::Item iType = itemFactory->createString(sType);
         std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
         column.push_back(pType);

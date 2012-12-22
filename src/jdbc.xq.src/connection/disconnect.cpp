@@ -28,29 +28,21 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JNIEnv *env = JdbcModule::getJavaEnv(aStaticContext);
+  JdbcModule::init(aStaticContext);
 
   JDBC_MODULE_TRY
     String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::getJavaClass(JC_CONNECTION, env);
-
-    jmethodID mIsClosed = env->GetMethodID(cConnection, "isClosed", "()Z");
-    CHECK_EXCEPTION(env);
-    jboolean isClosed = env->CallBooleanMethod(oConnection, mIsClosed);
-    CHECK_EXCEPTION(env);
+    jboolean isClosed = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.isClosed);
+    CHECK_EXCEPTION
     if (isClosed==JNI_TRUE) {
       JdbcModule::throwError("SQL08008", "Connection already closed.");
     }
-    jmethodID mClose = env->GetMethodID(cConnection, "close", "()V");
-    CHECK_EXCEPTION(env);
-    env->CallVoidMethod(oConnection, mClose);
-    CHECK_EXCEPTION(env);
-    if (isClosed== JNI_TRUE) {
-      JdbcModule::throwError("SQL08008", "Connection already closed.");
-    }
+
+    JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.close);
+    CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
   

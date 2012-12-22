@@ -68,7 +68,7 @@ class SQLTypes
     static long VARCHAR;
     
     
-    static void init(JNIEnv* env);
+    static void init();
     static bool isInt(long lType);
     static bool isFloat(long lType);
 
