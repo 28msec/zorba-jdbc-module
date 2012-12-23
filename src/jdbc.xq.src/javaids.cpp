@@ -30,12 +30,6 @@ namespace jdbc
     return true;
   }
   bool JavaConnection::init() {
-    TRANSACTION_NONE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_NONE", "I"));
-    TRANSACTION_READ_UNCOMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_UNCOMMITTED", "I"));
-    TRANSACTION_READ_COMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_COMMITTED", "I"));
-    TRANSACTION_REPEATABLE_READ = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_REPEATABLE_READ", "I"));
-    TRANSACTION_SERIALIZABLE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_SERIALIZABLE", "I"));
-
     classID = JdbcModule::env->FindClass("java/sql/Connection");
     commit = JdbcModule::env->GetMethodID(classID, "commit", "()V");
     rollback = JdbcModule::env->GetMethodID(classID, "rollback", "()V");
@@ -49,6 +43,12 @@ namespace jdbc
     close = JdbcModule::env->GetMethodID(classID, "close", "()V");
     createStatement = JdbcModule::env->GetMethodID(classID, "createStatement", "()Ljava/sql/Statement;");
     prepareStatement = JdbcModule::env->GetMethodID(classID, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;");
+
+    TRANSACTION_NONE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_NONE", "I"));
+    TRANSACTION_READ_UNCOMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_UNCOMMITTED", "I"));
+    TRANSACTION_READ_COMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_COMMITTED", "I"));
+    TRANSACTION_REPEATABLE_READ = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_REPEATABLE_READ", "I"));
+    TRANSACTION_SERIALIZABLE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_SERIALIZABLE", "I"));
     return true;
   }
   bool JavaStatement::init() {

@@ -79,6 +79,7 @@ class JdbcModule : public ExternalModule {
     static JavaResultSetMetadata jResultSetMetadata;
     static JavaPreparedStatement jPreparedStatement;
     static JavaParameterMetadata jParameterMetadata;
+    static void init(const zorba::StaticContext* aStaticContext);
 
     virtual String getURI() const
     { return JDBC_MODULE_NAMESPACE; }
@@ -110,8 +111,6 @@ class JdbcModule : public ExternalModule {
       getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
     static jobject 
       getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
-
-    static void init(const zorba::StaticContext* aStaticContext);
 
 };
 
