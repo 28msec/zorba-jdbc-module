@@ -42,10 +42,10 @@ ItemSequence_t
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
+    jclass cPreparedStatement = jPreparedStatement.classID;
     if (type == XS_STRING) {
-      jstring val =  JdbcModule::env->NewStringUTF(value.getStringValue().c_str());
-      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setString, index, val);
+      jstring val =  env->NewStringUTF(value.getStringValue().c_str());
+      env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setString, index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting string value.");
     }

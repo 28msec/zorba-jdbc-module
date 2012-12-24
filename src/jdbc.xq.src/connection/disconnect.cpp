@@ -35,13 +35,13 @@ DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jboolean isClosed = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.isClosed);
+    jboolean isClosed = env->CallBooleanMethod(oConnection, jConnection.isClosed);
     CHECK_EXCEPTION
     if (isClosed==JNI_TRUE) {
       JdbcModule::throwError("SQL08008", "Connection already closed.");
     }
 
-    JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.close);
+    env->CallVoidMethod(oConnection, jConnection.close);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH

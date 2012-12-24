@@ -37,7 +37,7 @@ ExecuteQueryPreparedFunction::evaluate(const ExternalFunction::Arguments_t& args
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    result = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.executeQuery);
+    result = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.executeQuery);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH

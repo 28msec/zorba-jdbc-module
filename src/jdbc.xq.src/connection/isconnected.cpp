@@ -37,7 +37,7 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    isClosed = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.isClosed);
+    isClosed = env->CallBooleanMethod(oConnection, jConnection.isClosed);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH

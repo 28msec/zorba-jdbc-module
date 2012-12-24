@@ -42,13 +42,13 @@ SetBooleanFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
+    jclass cPreparedStatement = jPreparedStatement.classID;
 
     if (type == XS_BOOLEAN) {
       jboolean val = JNI_FALSE;
       if (value.getBooleanValue())
         val = JNI_TRUE;
-      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setBoolean, index, val);
+      env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setBoolean, index, val);
     } else {
       JdbcModule::throwError("SQL004", "Error setting boolean value.");
     }

@@ -38,25 +38,25 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     std::vector<std::pair<Item, Item> > resultVector;
 
-    jboolean isAutocommit = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.getAutoCommit);
+    jboolean isAutocommit = env->CallBooleanMethod(oConnection, jConnection.getAutoCommit);
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("autocommit"), theFactory->createBoolean(isAutocommit==JNI_TRUE)));
     CHECK_EXCEPTION
-    jboolean isReadonly = JdbcModule::env->CallBooleanMethod(oConnection, JdbcModule::jConnection.isReadOnly);
+    jboolean isReadonly = env->CallBooleanMethod(oConnection, jConnection.isReadOnly);
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("readonly"), theFactory->createBoolean(isReadonly==JNI_TRUE)));
     CHECK_EXCEPTION
 
-    int isolationLevel = JdbcModule::env->CallIntMethod(oConnection, JdbcModule::jConnection.getTransactionIsolation);
+    int isolationLevel = env->CallIntMethod(oConnection, jConnection.getTransactionIsolation);
     CHECK_EXCEPTION
     String isolLevel;
-    if (isolationLevel==JdbcModule::jConnection.TRANSACTION_NONE) {
+    if (isolationLevel==jConnection.TRANSACTION_NONE) {
       isolLevel = "NOT-SUPPORTED";
-    } else if (isolationLevel==JdbcModule::jConnection.TRANSACTION_READ_UNCOMMITTED) {
+    } else if (isolationLevel==jConnection.TRANSACTION_READ_UNCOMMITTED) {
       isolLevel = "READ-UNCOMMITTED";
-    } else if (isolationLevel==JdbcModule::jConnection.TRANSACTION_READ_COMMITTED) {
+    } else if (isolationLevel==jConnection.TRANSACTION_READ_COMMITTED) {
       isolLevel = "READ-COMMITTED";
-    } else if (isolationLevel==JdbcModule::jConnection.TRANSACTION_REPEATABLE_READ) {
+    } else if (isolationLevel==jConnection.TRANSACTION_REPEATABLE_READ) {
       isolLevel = "REPEATABLE-READ";
-    } else if (isolationLevel==JdbcModule::jConnection.TRANSACTION_SERIALIZABLE) {
+    } else if (isolationLevel==jConnection.TRANSACTION_SERIALIZABLE) {
       isolLevel = "SERIALIZABLE";
     }
     resultVector.push_back(std::pair<Item, Item>(theFactory->createString("isolation-level"), theFactory->createString(isolLevel)));

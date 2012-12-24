@@ -39,18 +39,18 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
 
-    int rowsAffected = JdbcModule::env->CallIntMethod(oStatement, JdbcModule::jStatement.getUpdateCount);
+    int rowsAffected = env->CallIntMethod(oStatement, jStatement.getUpdateCount);
     CHECK_EXCEPTION
 
     std::vector<std::pair<zorba::Item, zorba::Item> > vResult;
     if (rowsAffected==-1) { // NON UPDATE QUERY
-      jobject oResultSet = JdbcModule::env->CallObjectMethod(oStatement, JdbcModule::jStatement.getResultSet);
+      jobject oResultSet = env->CallObjectMethod(oStatement, jStatement.getResultSet);
       CHECK_EXCEPTION
 
-      jobject oMetadata = JdbcModule::env->CallObjectMethod(oResultSet, JdbcModule::jResultSet.getMetaData);
+      jobject oMetadata = env->CallObjectMethod(oResultSet, jResultSet.getMetaData);
       CHECK_EXCEPTION
 
-      int columns = JdbcModule::env->CallIntMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnCount);
+      int columns = env->CallIntMethod(oMetadata, jResultSetMetadata.getColumnCount);
       CHECK_EXCEPTION
 
       std::vector<zorba::Item> elements;
@@ -58,17 +58,17 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
       for (int i=1; i<=columns; i++) {
           std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
-          jstring oName = (jstring) JdbcModule::env->CallObjectMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnName, i);
+          jstring oName = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnName, i);
           CHECK_EXCEPTION
-          String sName = JdbcModule::env->GetStringUTFChars(oName, NULL);
+          String sName = env->GetStringUTFChars(oName, NULL);
           CHECK_EXCEPTION
           zorba::Item iName = itemFactory->createString(sName);
           std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
           column.push_back(pName);
 
-          jstring oType = (jstring) JdbcModule::env->CallObjectMethod(oMetadata, JdbcModule::jResultSetMetadata.getColumnTypeName, i);
+          jstring oType = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnTypeName, i);
           CHECK_EXCEPTION
-          String  sType = JdbcModule::env->GetStringUTFChars(oType, NULL);
+          String  sType = env->GetStringUTFChars(oType, NULL);
           CHECK_EXCEPTION 
           zorba::Item iType = itemFactory->createString(sType);
           std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);

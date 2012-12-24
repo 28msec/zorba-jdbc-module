@@ -36,18 +36,18 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
+    jclass cPreparedStatement = jPreparedStatement.classID;
 
-    jobject oParameterMetadata = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getParameterMetaData);
+    jobject oParameterMetadata = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.getParameterMetaData);
     CHECK_EXCEPTION
 
-    jclass cParameterMetaData = JdbcModule::jParameterMetadata.classID;
+    jclass cParameterMetaData = jParameterMetadata.classID;
 
     long index = (long)JdbcModule::getItemArg(args, 1).getLongValue();
-    int parameterType = JdbcModule::env->CallIntMethod(oParameterMetadata, JdbcModule::jParameterMetadata.getParameterType, index);
+    int parameterType = env->CallIntMethod(oParameterMetadata, jParameterMetadata.getParameterType, index);
     CHECK_EXCEPTION
 
-      JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setNull, index, parameterType);
+      env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setNull, index, parameterType);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH

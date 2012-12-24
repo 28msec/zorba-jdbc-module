@@ -37,9 +37,9 @@ PrepareStatementFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jclass cConnection = JdbcModule::jConnection.classID;
-    jstring query =  JdbcModule::env->NewStringUTF(lQuery.c_str());
-    jobject oPrepared = JdbcModule::env->CallObjectMethod(oConnection, JdbcModule::jConnection.prepareStatement, query);
+    jclass cConnection = jConnection.classID;
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    jobject oPrepared = env->CallObjectMethod(oConnection, jConnection.prepareStatement, query);
     CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_PREPAREDSTATEMENTS);

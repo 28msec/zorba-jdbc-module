@@ -24,85 +24,85 @@ namespace jdbc
 {
 
   bool JavaDriverManager::init() {
-    classID = JdbcModule::env->FindClass("java/sql/DriverManager");
-    getConnection = JdbcModule::env->GetStaticMethodID(classID, "getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;");
-    getConnectionWithUser = JdbcModule::env->GetStaticMethodID(classID, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
+    classID = env->FindClass("java/sql/DriverManager");
+    getConnection = env->GetStaticMethodID(classID, "getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;");
+    getConnectionWithUser = env->GetStaticMethodID(classID, "getConnection", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/sql/Connection;");
     return true;
   }
   bool JavaConnection::init() {
-    classID = JdbcModule::env->FindClass("java/sql/Connection");
-    commit = JdbcModule::env->GetMethodID(classID, "commit", "()V");
-    rollback = JdbcModule::env->GetMethodID(classID, "rollback", "()V");
-    setAutoCommit = JdbcModule::env->GetMethodID(classID, "setAutoCommit", "(Z)V");
-    setReadOnly = JdbcModule::env->GetMethodID(classID, "setReadOnly", "(Z)V");
-    setTransactionIsolation = JdbcModule::env->GetMethodID(classID, "setTransactionIsolation", "(I)V");
-    getAutoCommit = JdbcModule::env->GetMethodID(classID, "getAutoCommit", "()Z");
-    isReadOnly = JdbcModule::env->GetMethodID(classID, "isReadOnly", "()Z");
-    getTransactionIsolation =  JdbcModule::env->GetMethodID(classID, "getTransactionIsolation", "()I");
-    isClosed = JdbcModule::env->GetMethodID(classID, "isClosed", "()Z");
-    close = JdbcModule::env->GetMethodID(classID, "close", "()V");
-    createStatement = JdbcModule::env->GetMethodID(classID, "createStatement", "()Ljava/sql/Statement;");
-    prepareStatement = JdbcModule::env->GetMethodID(classID, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;");
+    classID = env->FindClass("java/sql/Connection");
+    commit = env->GetMethodID(classID, "commit", "()V");
+    rollback = env->GetMethodID(classID, "rollback", "()V");
+    setAutoCommit = env->GetMethodID(classID, "setAutoCommit", "(Z)V");
+    setReadOnly = env->GetMethodID(classID, "setReadOnly", "(Z)V");
+    setTransactionIsolation = env->GetMethodID(classID, "setTransactionIsolation", "(I)V");
+    getAutoCommit = env->GetMethodID(classID, "getAutoCommit", "()Z");
+    isReadOnly = env->GetMethodID(classID, "isReadOnly", "()Z");
+    getTransactionIsolation =  env->GetMethodID(classID, "getTransactionIsolation", "()I");
+    isClosed = env->GetMethodID(classID, "isClosed", "()Z");
+    close = env->GetMethodID(classID, "close", "()V");
+    createStatement = env->GetMethodID(classID, "createStatement", "()Ljava/sql/Statement;");
+    prepareStatement = env->GetMethodID(classID, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;");
 
-    TRANSACTION_NONE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_NONE", "I"));
-    TRANSACTION_READ_UNCOMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_UNCOMMITTED", "I"));
-    TRANSACTION_READ_COMMITTED = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_READ_COMMITTED", "I"));
-    TRANSACTION_REPEATABLE_READ = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_REPEATABLE_READ", "I"));
-    TRANSACTION_SERIALIZABLE = JdbcModule::env->GetStaticIntField(classID, JdbcModule::env->GetStaticFieldID(classID, "TRANSACTION_SERIALIZABLE", "I"));
+    TRANSACTION_NONE = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_NONE", "I"));
+    TRANSACTION_READ_UNCOMMITTED = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_READ_UNCOMMITTED", "I"));
+    TRANSACTION_READ_COMMITTED = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_READ_COMMITTED", "I"));
+    TRANSACTION_REPEATABLE_READ = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_REPEATABLE_READ", "I"));
+    TRANSACTION_SERIALIZABLE = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_SERIALIZABLE", "I"));
     return true;
   }
   bool JavaStatement::init() {
-    classID = JdbcModule::env->FindClass("java/sql/Statement");
-    getUpdateCount = JdbcModule::env->GetMethodID(classID, "getUpdateCount", "()I");
-    getResultSet = JdbcModule::env->GetMethodID(classID, "getResultSet", "()Ljava/sql/ResultSet;");
-    execute = JdbcModule::env->GetMethodID(classID, "execute", "(Ljava/lang/String;)Z");
-    executeQuery = JdbcModule::env->GetMethodID(classID, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;");
-    executeUpdate = JdbcModule::env->GetMethodID(classID, "executeUpdate", "(Ljava/lang/String;)I");
+    classID = env->FindClass("java/sql/Statement");
+    getUpdateCount = env->GetMethodID(classID, "getUpdateCount", "()I");
+    getResultSet = env->GetMethodID(classID, "getResultSet", "()Ljava/sql/ResultSet;");
+    execute = env->GetMethodID(classID, "execute", "(Ljava/lang/String;)Z");
+    executeQuery = env->GetMethodID(classID, "executeQuery", "(Ljava/lang/String;)Ljava/sql/ResultSet;");
+    executeUpdate = env->GetMethodID(classID, "executeUpdate", "(Ljava/lang/String;)I");
     return true;
   }
   bool JavaResultSet::init() {
-    classID = JdbcModule::env->FindClass("java/sql/ResultSet");
-    last = JdbcModule::env->GetMethodID(classID, "last", "()Z");
-    getRow = JdbcModule::env->GetMethodID(classID, "getRow", "()I");
-    getMetaData = JdbcModule::env->GetMethodID(classID, "getMetaData", "()Ljava/sql/ResultSetMetaData;");
-    beforeFirst = JdbcModule::env->GetMethodID(classID, "beforeFirst", "()V");
-    next = JdbcModule::env->GetMethodID(classID, "next", "()Z");
-    getInt = JdbcModule::env->GetMethodID(classID, "getInt", "(I)I");
-    getDouble = JdbcModule::env->GetMethodID(classID, "getDouble", "(I)D");
-    getString = JdbcModule::env->GetMethodID(classID, "getString", "(I)Ljava/lang/String;");
+    classID = env->FindClass("java/sql/ResultSet");
+    last = env->GetMethodID(classID, "last", "()Z");
+    getRow = env->GetMethodID(classID, "getRow", "()I");
+    getMetaData = env->GetMethodID(classID, "getMetaData", "()Ljava/sql/ResultSetMetaData;");
+    beforeFirst = env->GetMethodID(classID, "beforeFirst", "()V");
+    next = env->GetMethodID(classID, "next", "()Z");
+    getInt = env->GetMethodID(classID, "getInt", "(I)I");
+    getDouble = env->GetMethodID(classID, "getDouble", "(I)D");
+    getString = env->GetMethodID(classID, "getString", "(I)Ljava/lang/String;");
     return true;
   }
   bool JavaResultSetMetadata::init() {
-    classID = JdbcModule::env->FindClass("java/sql/ResultSetMetaData");
-    getColumnCount = JdbcModule::env->GetMethodID(classID, "getColumnCount", "()I");
-    getColumnType = JdbcModule::env->GetMethodID(classID, "getColumnType", "(I)I");
-    getColumnName = JdbcModule::env->GetMethodID(classID, "getColumnName", "(I)Ljava/lang/String;");
-    getColumnTypeName = JdbcModule::env->GetMethodID(classID, "getColumnTypeName", "(I)Ljava/lang/String;");
+    classID = env->FindClass("java/sql/ResultSetMetaData");
+    getColumnCount = env->GetMethodID(classID, "getColumnCount", "()I");
+    getColumnType = env->GetMethodID(classID, "getColumnType", "(I)I");
+    getColumnName = env->GetMethodID(classID, "getColumnName", "(I)Ljava/lang/String;");
+    getColumnTypeName = env->GetMethodID(classID, "getColumnTypeName", "(I)Ljava/lang/String;");
     return true;
   }
   bool JavaPreparedStatement::init() {
-    classID = JdbcModule::env->FindClass("java/sql/PreparedStatement");
-    clearParameters = JdbcModule::env->GetMethodID(classID, "clearParameters", "()V");
-    execute = JdbcModule::env->GetMethodID(classID, "execute", "()Z");
-    executeQuery = JdbcModule::env->GetMethodID(classID, "executeQuery", "()Ljava/sql/ResultSet;");
-    executeUpdate = JdbcModule::env->GetMethodID(classID, "executeUpdate", "()I");
-    getParameterMetaData = JdbcModule::env->GetMethodID(classID, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;");
-    getUpdateCount = JdbcModule::env->GetMethodID(classID, "getUpdateCount", "()I");
-    getResultSet = JdbcModule::env->GetMethodID(classID, "getResultSet", "()Ljava/sql/ResultSet;");
-    setBoolean = JdbcModule::env->GetMethodID(classID, "setBoolean", "(IZ)V");
-    setNull = JdbcModule::env->GetMethodID(classID, "setNull", "(II)V");
-    setDouble = JdbcModule::env->GetMethodID(classID, "setDouble", "(ID)V");
-    setFloat = JdbcModule::env->GetMethodID(classID, "setFloat", "(IF)V");
-    setLong = JdbcModule::env->GetMethodID(classID, "setLong", "(IJ)V");
-    setString = JdbcModule::env->GetMethodID(classID, "setString", "(ILjava/lang/String;)V");
+    classID = env->FindClass("java/sql/PreparedStatement");
+    clearParameters = env->GetMethodID(classID, "clearParameters", "()V");
+    execute = env->GetMethodID(classID, "execute", "()Z");
+    executeQuery = env->GetMethodID(classID, "executeQuery", "()Ljava/sql/ResultSet;");
+    executeUpdate = env->GetMethodID(classID, "executeUpdate", "()I");
+    getParameterMetaData = env->GetMethodID(classID, "getParameterMetaData", "()Ljava/sql/ParameterMetaData;");
+    getUpdateCount = env->GetMethodID(classID, "getUpdateCount", "()I");
+    getResultSet = env->GetMethodID(classID, "getResultSet", "()Ljava/sql/ResultSet;");
+    setBoolean = env->GetMethodID(classID, "setBoolean", "(IZ)V");
+    setNull = env->GetMethodID(classID, "setNull", "(II)V");
+    setDouble = env->GetMethodID(classID, "setDouble", "(ID)V");
+    setFloat = env->GetMethodID(classID, "setFloat", "(IF)V");
+    setLong = env->GetMethodID(classID, "setLong", "(IJ)V");
+    setString = env->GetMethodID(classID, "setString", "(ILjava/lang/String;)V");
     return true;
   }
   bool JavaParameterMetadata::init() {
-    classID = JdbcModule::env->FindClass("java/sql/ParameterMetaData");
-    getParameterCount = JdbcModule::env->GetMethodID(classID, "getParameterCount", "()I");
-    getParameterTypeName = JdbcModule::env->GetMethodID(classID, "getParameterTypeName",  "(I)Ljava/lang/String;");
-    getParameterClassName = JdbcModule::env->GetMethodID(classID, "getParameterClassName", "(I)Ljava/lang/String;");
-    getParameterType = JdbcModule::env->GetMethodID(classID, "getParameterType", "(I)I");
+    classID = env->FindClass("java/sql/ParameterMetaData");
+    getParameterCount = env->GetMethodID(classID, "getParameterCount", "()I");
+    getParameterTypeName = env->GetMethodID(classID, "getParameterTypeName",  "(I)Ljava/lang/String;");
+    getParameterClassName = env->GetMethodID(classID, "getParameterClassName", "(I)Ljava/lang/String;");
+    getParameterType = env->GetMethodID(classID, "getParameterType", "(I)I");
     return true;
   }
 

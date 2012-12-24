@@ -42,22 +42,22 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
+    jclass cPreparedStatement = jPreparedStatement.classID;
 
     switch (type) {
       case XS_DOUBLE:
-        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setDouble, index, value.getDoubleValue());
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setDouble, index, value.getDoubleValue());
       break;
       case XS_FLOAT:
-        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setFloat, index, value.getDoubleValue());
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setFloat, index, value.getDoubleValue());
       break;
       case XS_INTEGER:
-        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setLong, index, value.getLongValue());
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setLong, index, value.getLongValue());
       break;
       case XS_DECIMAL:
         double dVal;
         sscanf(value.getStringValue().c_str(), "%lf", &dVal);
-        JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.setDouble, index,  dVal);
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setDouble, index,  dVal);
       break;
       default:
         JdbcModule::throwError("SQL004", "Error setting numeric value.");

@@ -37,15 +37,15 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
-    jclass cPreparedStatement = JdbcModule::jPreparedStatement.classID;
+    jclass cPreparedStatement = jPreparedStatement.classID;
 
-    int iUpdateCount = JdbcModule::env->CallIntMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getUpdateCount);
+    int iUpdateCount = env->CallIntMethod(oPreparedStatement, jPreparedStatement.getUpdateCount);
     CHECK_EXCEPTION
     if (iUpdateCount != -1) {
        JdbcModule::throwError("SQL005", "Query must be a non-updating query.");
     }
 
-    result = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getResultSet);
+    result = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.getResultSet);
     CHECK_EXCEPTION
     
   JDBC_MODULE_CATCH

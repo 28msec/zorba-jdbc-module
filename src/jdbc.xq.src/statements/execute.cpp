@@ -38,11 +38,11 @@ ExecuteFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 
-    jobject oStatement = JdbcModule::env->CallObjectMethod(oConnection, JdbcModule::jConnection.createStatement);
+    jobject oStatement = env->CallObjectMethod(oConnection, jConnection.createStatement);
     CHECK_EXCEPTION
 
-    jstring query =  JdbcModule::env->NewStringUTF(lQuery.c_str());
-    JdbcModule::env->CallBooleanMethod(oStatement, JdbcModule::jStatement.execute, query);
+    jstring query =  env->NewStringUTF(lQuery.c_str());
+    env->CallBooleanMethod(oStatement, jStatement.execute, query);
     CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);

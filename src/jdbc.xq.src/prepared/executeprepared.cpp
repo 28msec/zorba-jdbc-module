@@ -37,7 +37,7 @@ ExecutePreparedFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    JdbcModule::env->CallBooleanMethod(oPreparedStatement, JdbcModule::jPreparedStatement.execute);
+    env->CallBooleanMethod(oPreparedStatement, jPreparedStatement.execute);
     CHECK_EXCEPTION
 
     InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, INSTANCE_MAP_STATEMENTS);

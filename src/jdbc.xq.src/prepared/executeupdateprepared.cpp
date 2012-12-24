@@ -37,7 +37,7 @@ ExecuteUpdatePreparedFunction::evaluate(const ExternalFunction::Arguments_t& arg
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    int rowCount = JdbcModule::env->CallIntMethod(oPreparedStatement, JdbcModule::jPreparedStatement.executeUpdate);
+    int rowCount = env->CallIntMethod(oPreparedStatement, jPreparedStatement.executeUpdate);
     CHECK_EXCEPTION
 
     result = theFactory->createInteger(rowCount);

@@ -30,13 +30,6 @@
 
 class JavaException {};
 
-#define CHECK_EXCEPTION  if ((lException = JdbcModule::env->ExceptionOccurred())) throw JavaException();
-#define JDBC_MODULE_TRY  jthrowable lException = 0;  try   {
-#define JDBC_MODULE_CATCH   }  catch (zorba::jvm::VMOpenException&)  { \
-                              JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?)."); \
-                            }  catch (JavaException&)  { \
-                               JdbcModule::throwJavaException(JdbcModule::env, lException); \
-                            }
 
 #define LOG_ACTIVE
 #ifdef LOG_ACTIVE
@@ -49,6 +42,23 @@ namespace zorba
 {
 namespace jdbc
 {
+
+extern JNIEnv* env;
+extern JavaDriverManager     jDriverManager;
+extern JavaConnection        jConnection;
+extern JavaStatement         jStatement;
+extern JavaResultSet         jResultSet;
+extern JavaResultSetMetadata jResultSetMetadata;
+extern JavaPreparedStatement jPreparedStatement;
+extern JavaParameterMetadata jParameterMetadata;
+
+#define CHECK_EXCEPTION  if ((lException = env->ExceptionOccurred())) throw JavaException();
+#define JDBC_MODULE_TRY  jthrowable lException = 0;  try   {
+#define JDBC_MODULE_CATCH   }  catch (zorba::jvm::VMOpenException&)  { \
+                              JdbcModule::throwError("VM001", "Could not start the Java VM (is the classpath set?)."); \
+                            }  catch (JavaException&)  { \
+                               JdbcModule::throwJavaException(env, lException); \
+                            }
 
 class JdbcModule : public ExternalModule {
   protected:
@@ -71,14 +81,6 @@ class JdbcModule : public ExternalModule {
     ~JdbcModule()
     {};
 
-    static JNIEnv* env;
-    static JavaDriverManager     jDriverManager;
-    static JavaConnection        jConnection;
-    static JavaStatement         jStatement;
-    static JavaResultSet         jResultSet;
-    static JavaResultSetMetadata jResultSetMetadata;
-    static JavaPreparedStatement jPreparedStatement;
-    static JavaParameterMetadata jParameterMetadata;
     static void init(const zorba::StaticContext* aStaticContext);
 
     virtual String getURI() const

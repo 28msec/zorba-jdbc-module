@@ -37,10 +37,10 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    jobject oParameterMetaData = JdbcModule::env->CallObjectMethod(oPreparedStatement, JdbcModule::jPreparedStatement.getParameterMetaData);
+    jobject oParameterMetaData = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.getParameterMetaData);
     CHECK_EXCEPTION
 
-    int columns = JdbcModule::env->CallIntMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterCount);
+    int columns = env->CallIntMethod(oParameterMetaData, jParameterMetadata.getParameterCount);
     CHECK_EXCEPTION
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
@@ -49,17 +49,17 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
     for (int i=1; i<=columns; i++) {
         std::vector<std::pair<zorba::Item, zorba::Item> > column;
 
-        jstring oName = (jstring) JdbcModule::env->CallObjectMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterClassName, i);
+        jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterClassName, i);
         CHECK_EXCEPTION
-        String sName = JdbcModule::env->GetStringUTFChars(oName, NULL);
+        String sName = env->GetStringUTFChars(oName, NULL);
         CHECK_EXCEPTION
         zorba::Item iName = itemFactory->createString(sName);
         std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
         column.push_back(pName);
 
-        jstring oType = (jstring) JdbcModule::env->CallObjectMethod(oParameterMetaData, JdbcModule::jParameterMetadata.getParameterTypeName, i);
+        jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterTypeName, i);
         CHECK_EXCEPTION
-        String  sType = JdbcModule::env->GetStringUTFChars(oType, NULL);
+        String  sType = env->GetStringUTFChars(oType, NULL);
         CHECK_EXCEPTION 
         zorba::Item iType = itemFactory->createString(sType);
         std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);

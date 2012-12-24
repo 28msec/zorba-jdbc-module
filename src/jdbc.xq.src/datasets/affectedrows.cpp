@@ -38,18 +38,18 @@ AffectedRowsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
-    int rowsAffected = JdbcModule::env->CallIntMethod(oStatement, JdbcModule::jStatement.getUpdateCount);
+    int rowsAffected = env->CallIntMethod(oStatement, jStatement.getUpdateCount);
     CHECK_EXCEPTION
 
     if (rowsAffected==-1) { // NON UPDATE QUERY
-      jobject oResultSet = JdbcModule::env->CallObjectMethod(oStatement, JdbcModule::jStatement.getResultSet);
+      jobject oResultSet = env->CallObjectMethod(oStatement, jStatement.getResultSet);
       CHECK_EXCEPTION
 
-      jboolean hasRows = JdbcModule::env->CallBooleanMethod(oResultSet, JdbcModule::jResultSet.last);
+      jboolean hasRows = env->CallBooleanMethod(oResultSet, jResultSet.last);
       CHECK_EXCEPTION
 
       if (hasRows==JNI_TRUE) {
-        rowsAffected = JdbcModule::env->CallBooleanMethod(oResultSet, JdbcModule::jResultSet.getRow);
+        rowsAffected = env->CallBooleanMethod(oResultSet, jResultSet.getRow);
         CHECK_EXCEPTION
       } else {
         rowsAffected=0;

@@ -36,7 +36,7 @@ ClearParamsFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
-    JdbcModule::env->CallVoidMethod(oPreparedStatement, JdbcModule::jPreparedStatement.clearParameters);
+    env->CallVoidMethod(oPreparedStatement, jPreparedStatement.clearParameters);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH

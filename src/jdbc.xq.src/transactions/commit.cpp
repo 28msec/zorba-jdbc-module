@@ -35,7 +35,7 @@ CommitFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 
-    JdbcModule::env->CallVoidMethod(oConnection, JdbcModule::jConnection.commit);
+    env->CallVoidMethod(oConnection, jConnection.commit);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
