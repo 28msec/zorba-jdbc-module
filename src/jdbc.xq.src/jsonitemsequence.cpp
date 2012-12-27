@@ -43,6 +43,7 @@ namespace jdbc
       for(int i=0; i<columnCount; i++){
         jstring oName = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnName, i+1);
         CHECK_EXCEPTION
+        LOG("JsonItemSequence A, oName: " << oName);
         const char * cName = env->GetStringUTFChars(oName, 0);
         CHECK_EXCEPTION
         columnNames[i] = String(cName);
@@ -81,6 +82,7 @@ namespace jdbc
         } else {
           jstring sValue = (jstring) env->CallObjectMethod(oResultSet, jResultSet.getString, i+1);
           CHECK_EXCEPTION
+          LOG("JsonItemSequence B, sValue: " << sValue);
           const char *value = env->GetStringUTFChars(sValue, 0);
           CHECK_EXCEPTION
           aValue = itemFactory->createString(zorba::String(value));
