@@ -29,7 +29,7 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JdbcModule::init(aStaticContext);
+  CHECK_CONNECTION
   jobject result=NULL;
 
   JDBC_MODULE_TRY

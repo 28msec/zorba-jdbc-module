@@ -30,7 +30,7 @@ ItemSequence_t
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JdbcModule::init(aStaticContext);
+  CHECK_CONNECTION
   Item result;
 
   JDBC_MODULE_TRY

@@ -28,7 +28,7 @@ RollbackFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  JdbcModule::init(aStaticContext);
+  CHECK_CONNECTION
 
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
