@@ -81,7 +81,7 @@ class JdbcModule : public ExternalModule {
     ~JdbcModule()
     {};
 
-    static void init(const zorba::StaticContext* aStaticContext);
+    static void initGlobals(const zorba::StaticContext* aStaticContext);
 
     virtual String getURI() const
     { return JDBC_MODULE_NAMESPACE; }

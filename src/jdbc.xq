@@ -140,27 +140,27 @@ declare %an:sequential function jdbc:prepare-statement(
 declare %an:sequential function jdbc:set-numeric(
                                      $prepared-statement as xs:anyURI, 
                                      $parameter-index as xs:decimal, 
-                                     $value as xs:anyAtomicType) external;
+                                     $value as xs:anyAtomicType) as empty-sequence() external;
 (:
  :  5.2.2 Set the value of the designated parameter with the given value.
  :)
 declare %an:sequential function jdbc:set-string(
                                      $prepared-statement as xs:anyURI,
                                      $parameter-index as xs:integer,
-                                     $value as xs:string) external;
+                                     $value as xs:string) as empty-sequence() external;
 (:
  :  5.2.3 Set the value of the designated parameter with the given value.
  :)
 declare %an:sequential function jdbc:set-boolean(
                                      $prepared-statement as xs:anyURI, 
                                      $parameter-index as xs:integer,
-                                     $value as xs:boolean) external;
+                                     $value as xs:boolean) as empty-sequence() external;
 (:
  :  5.2.4 Set the value of the designated parameter with the given value.
  :)
 declare %an:sequential function jdbc:set-null(
                                      $prepared-statement as xs:anyURI,
-                                     $parameter-index as xs:integer) external;
+                                     $parameter-index as xs:integer) as empty-sequence() external;
 (:
  :  5.3 Clears the current parameter values immediately.
  :)

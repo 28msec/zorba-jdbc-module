@@ -51,20 +51,26 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
         jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterClassName, i);
         CHECK_EXCEPTION
-        String sName = env->GetStringUTFChars(oName, NULL);
+        const char * cName = env->GetStringUTFChars(oName, 0);
         CHECK_EXCEPTION
+        String sName(cName);
         zorba::Item iName = itemFactory->createString(sName);
         std::pair<zorba::Item, zorba::Item> pName(itemFactory->createString("name"), iName);
         column.push_back(pName);
+        env->ReleaseStringUTFChars(oName, cName);
+        CHECK_EXCEPTION 
 
         jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterTypeName, i);
         CHECK_EXCEPTION
-        String  sType = env->GetStringUTFChars(oType, NULL);
+        const char * cType = env->GetStringUTFChars(oType, 0);
         CHECK_EXCEPTION 
+        String  sType(cType);
         zorba::Item iType = itemFactory->createString(sType);
         std::pair<zorba::Item, zorba::Item> pType(itemFactory->createString("type"), iType);
         column.push_back(pType);
         elements.push_back(itemFactory->createJSONObject(column));
+        env->ReleaseStringUTFChars(oType, cType);
+        CHECK_EXCEPTION 
     }
     std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createJSONArray(elements));
     std::vector<std::pair<zorba::Item, zorba::Item> > vResult;

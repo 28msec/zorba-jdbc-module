@@ -305,7 +305,7 @@ jobject
     return oResult;
 }
 
-void JdbcModule::init(const zorba::StaticContext* aStaticContext) {
+void JdbcModule::initGlobals(const zorba::StaticContext* aStaticContext) {
   if (env!=NULL) 
     return;
   JDBC_MODULE_TRY

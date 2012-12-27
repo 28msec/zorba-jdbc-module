@@ -43,8 +43,11 @@ namespace jdbc
       for(int i=0; i<columnCount; i++){
         jstring oName = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnName, i+1);
         CHECK_EXCEPTION
-        columnNames[i] = env->GetStringUTFChars(oName, NULL);
+        const char * cName = env->GetStringUTFChars(oName, 0);
         CHECK_EXCEPTION
+        columnNames[i] = String(cName);
+        env->ReleaseStringUTFChars(oName, cName);
+        CHECK_EXCEPTION 
         columnTypes[i] = env->CallIntMethod(oMetadata, jResultSetMetadata.getColumnType, i+1);
         CHECK_EXCEPTION
       }
@@ -78,7 +81,7 @@ namespace jdbc
         } else {
           jstring sValue = (jstring) env->CallObjectMethod(oResultSet, jResultSet.getString, i+1);
           CHECK_EXCEPTION
-          const char *value = env->GetStringUTFChars(sValue, NULL);
+          const char *value = env->GetStringUTFChars(sValue, 0);
           CHECK_EXCEPTION
           aValue = itemFactory->createString(zorba::String(value));
         }
