@@ -42,7 +42,6 @@ ItemSequence_t
     Item value = JdbcModule::getItemArg(args, 2);
     int type = value.getTypeCode();
 
-    jclass cPreparedStatement = jPreparedStatement.classID;
     if (type == XS_STRING) {
       jstring val =  env->NewStringUTF(value.getStringValue().c_str());
       env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setString, index, val);

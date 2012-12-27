@@ -37,8 +37,6 @@ ResultSetFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
-    jclass cPreparedStatement = jPreparedStatement.classID;
-
     int iUpdateCount = env->CallIntMethod(oPreparedStatement, jPreparedStatement.getUpdateCount);
     CHECK_EXCEPTION
     if (iUpdateCount != -1) {

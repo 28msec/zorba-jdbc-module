@@ -29,7 +29,7 @@ IsConnectedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::DynamicContext* aDynamincContext) const
 {
   CHECK_CONNECTION  
-  jboolean isClosed;
+  jboolean isClosed = JNI_FALSE;
   JDBC_MODULE_TRY
     String lConnectionUUID = JdbcModule::getStringArg(args, 0);
 
