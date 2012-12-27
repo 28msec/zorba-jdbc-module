@@ -220,7 +220,6 @@ JdbcModule::throwJavaException(JNIEnv *env, jthrowable& lException)
   jobject errorMessageObj = env->CallObjectMethod(
       stringWriter, toStringMethod);
   jstring errorMessage = (jstring) errorMessageObj;
-  LOG("JDBC, Error check: " << errorMessage);
   const char *errMsg = env->GetStringUTFChars(errorMessage, 0);
   std::stringstream s;
   s << "A Java Exception was thrown:" << std::endl << errMsg;

@@ -51,7 +51,6 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
         jstring oName = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterClassName, i);
         CHECK_EXCEPTION
-        LOG("ParameterMetadata A, oName: " << oName);
         const char * cName = env->GetStringUTFChars(oName, 0);
         CHECK_EXCEPTION
         String sName(cName);
@@ -63,7 +62,6 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
         jstring oType = (jstring) env->CallObjectMethod(oParameterMetaData, jParameterMetadata.getParameterTypeName, i);
         CHECK_EXCEPTION
-        LOG("ParameterMetadata B, oType: " << oType);
         const char * cType = env->GetStringUTFChars(oType, 0);
         CHECK_EXCEPTION 
         String  sType(cType);

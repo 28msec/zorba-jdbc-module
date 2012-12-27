@@ -60,7 +60,6 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
           jstring oName = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnName, i);
           CHECK_EXCEPTION
-          LOG("Metadata A, oName: " << oName);
           const char * cName = env->GetStringUTFChars(oName, 0);
           String sName(cName);
           CHECK_EXCEPTION
@@ -72,7 +71,6 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
 
           jstring oType = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnTypeName, i);
           CHECK_EXCEPTION
-          LOG("Metadata B, oType: " << oType);
           const char * cType = env->GetStringUTFChars(oType, 0);
           CHECK_EXCEPTION 
           String  sType(cType);
