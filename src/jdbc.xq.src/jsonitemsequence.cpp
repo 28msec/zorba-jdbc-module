@@ -84,11 +84,11 @@ namespace jdbc
           if (sValue!=NULL) {
           const char *value = env->GetStringUTFChars(sValue, 0);
           CHECK_EXCEPTION
-          aValue = itemFactory->createString(zorba::String(value));
+          aValue = itemFactory->createString(String(value));
+          env->ReleaseStringUTFChars(sValue, value);
           } else {
-            aValue = itemFactory->createString("");
+            aValue = itemFactory->createJSONNull();
           }
-
         }
         elements.push_back(std::pair<zorba::Item, zorba::Item>(aKey, aValue));
       }

@@ -67,6 +67,7 @@ JavaResultSet         jResultSet;
 JavaResultSetMetadata jResultSetMetadata;
 JavaPreparedStatement jPreparedStatement;
 JavaParameterMetadata jParameterMetadata;
+bool isOutputJSON = true;
 
 zorba::ExternalFunction* 
 JdbcModule::getExternalFunction(const zorba::String& localName)

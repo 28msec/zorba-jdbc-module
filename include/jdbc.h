@@ -51,6 +51,7 @@ extern JavaResultSet         jResultSet;
 extern JavaResultSetMetadata jResultSetMetadata;
 extern JavaPreparedStatement jPreparedStatement;
 extern JavaParameterMetadata jParameterMetadata;
+extern bool isOutputJSON;
 
 #define CHECK_EXCEPTION  if ((lException = env->ExceptionOccurred())) throw JavaException();
 #define JDBC_MODULE_TRY  jthrowable lException = 0;  try   {
