@@ -82,10 +82,10 @@ namespace jdbc
           jstring sValue = (jstring) env->CallObjectMethod(oResultSet, jResultSet.getString, i+1);
           CHECK_EXCEPTION
           if (sValue!=NULL) {
-          const char *value = env->GetStringUTFChars(sValue, 0);
-          CHECK_EXCEPTION
-          aValue = itemFactory->createString(String(value));
-          env->ReleaseStringUTFChars(sValue, value);
+            const char *value = env->GetStringUTFChars(sValue, 0);
+            CHECK_EXCEPTION
+            aValue = itemFactory->createString(String(value));
+            env->ReleaseStringUTFChars(sValue, value);
           } else {
             aValue = itemFactory->createJSONNull();
           }
