@@ -1,13 +1,8 @@
 #!/bin/bash
 
-while getopts distchj: opt
+while getopts distch: opt
 do
   case "$opt" in
-        j)
-            JAVA7="$OPTARG"
-            echo "Java7 path: $JAVA7" 
-            
-            ;;
         d)
             echo "Download" 
             wget http://cdn.mysql.com/Downloads/MySQL-5.5/mysql-5.5.28-linux2.6-x86_64.tar.gz
@@ -18,8 +13,6 @@ do
             tar -xvzf mysql-5.5.28-linux2.6-x86_64.tar.gz
             tar -xvzf mysql-connector-java-5.1.22.tar.gz
             mv mysql-5.5.28-linux2.6-x86_64 mysql
-            export RQ_TMP_CLASSPATH=$CLASSPATH
-            export CLASSPATH=$CLASSPATH:$PWD/mysql-connector-java-5.1.22/mysql-connector-java-5.1.22.jar
             sudo apt-get install libaio1
             sudo mkdir -p /var/lib/mysql_rq
             sudo chown -R mysql.mysql /var/lib/mysql_rq
@@ -48,12 +41,9 @@ do
             rm -fR ./mysql-connector-java-5.1.22
             sudo -fR /var/lib/mysql_rq
             sudo -fR /var/log/mysql_rq
-            export CLASSPATH=$RQ_TMP_CLASSPATH
-            unset RQ_TMP_CLASSPATH
             ;;            
         h)
-            echo "usage: sudo $0 [-j java7/path] [-distcvh] "
-            echo "       -j  Java7 path"
+            echo "usage: sudo $0 [-distcvh] "
             echo "       -d  Download MySQL DB"
             echo "       -i  Install"
             echo "       -s  Start service"
