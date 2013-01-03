@@ -49,6 +49,7 @@
 #include "setnull.h"
 #include "setnumeric.h"
 #include "setstring.h"
+#include "setvalue.h"
 #include "affectedrows.h"
 #include "metadata.h"
 #include "resultset.h"
@@ -113,10 +114,6 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ExecuteQueryFunction(this);
     }
-    else if (localName == "execute-query-deterministic")
-    {
-      lFunc = new ExecuteQueryDeterministicFunction(this);
-    }
     else if (localName == "execute-update")
     {
       lFunc = new ExecuteUpdateFunction(this);
@@ -141,6 +138,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     else if (localName == "set-null")
     {
       lFunc = new SetNullFunction(this);
+    }
+    else if (localName == "set-value")
+    {
+      lFunc = new SetValueFunction(this);
     }
     else if (localName == "clear-params")
     {

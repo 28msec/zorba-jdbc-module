@@ -111,13 +111,7 @@ declare function jdbc:execute-query(
                       $connection-id as xs:anyURI, 
                       $sql as xs:string) as object()* external;
 (:
- :  4.3 Executes deterministic read-only SQL statements provided as $sql string.
- :)
-declare function jdbc:execute-query-deterministic( 
-                      $connection-id as xs:anyURI,
-                      $sql as xs:string) as object()* external;
-(:
- :  4.4 Executes only updating SQL statements provided as $sql string.
+ :  4.3 Executes only updating SQL statements provided as $sql string.
  :)
 declare function jdbc:execute-update(
                       $connection-id as xs:anyURI,

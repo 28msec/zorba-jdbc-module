@@ -27,7 +27,7 @@ namespace zorba
 namespace jdbc
 {
 
-class SetNumericFunction : public ContextualExternalFunction
+class SetValueFunction : public ContextualExternalFunction
 {
   private:
     const ExternalModule* theModule;
@@ -35,13 +35,13 @@ class SetNumericFunction : public ContextualExternalFunction
     XmlDataManager* theDataManager;
 
   public:
-    SetNumericFunction(const ExternalModule* aModule) :
+    SetValueFunction(const ExternalModule* aModule) :
       theModule(aModule),
       theFactory(Zorba::getInstance(0)->getItemFactory()),
       theDataManager(Zorba::getInstance(0)->getXmlDataManager())
     {}
 
-    ~SetNumericFunction()
+    ~SetValueFunction()
     {}
 
   public:
@@ -59,5 +59,5 @@ class SetNumericFunction : public ContextualExternalFunction
 
 
 
-}}; // namespace zorba, jdbc
+}} // namespace zorba, jdbc
 

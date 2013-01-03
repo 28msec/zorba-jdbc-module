@@ -26,7 +26,7 @@ namespace jdbc
 
 
 ItemSequence_t
-SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
+SetValueFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
@@ -48,31 +48,37 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
       break;
       case XS_FLOAT:
         env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setFloat, index, value.getDoubleValue());
-      break;
+        break;
       case XS_INTEGER:
         env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setLong, index, value.getLongValue());
-      break;
-      case XS_DECIMAL:
+        break;
+      case XS_DECIMAL: {
         double dVal;
         sscanf(value.getStringValue().c_str(), "%lf", &dVal);
         env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setDouble, index,  dVal);
-      break;
-      case XS_BOOLEAN:
-        jboolean val = JNI_FALSE;
+        break;
+      }
+      case XS_BOOLEAN: {
+        jboolean boolval = JNI_FALSE;
         if (value.getBooleanValue())
-          val = JNI_TRUE;
-        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setBoolean, index, val);
-      case JS_NULL:
+          boolval = JNI_TRUE;
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setBoolean, index, boolval);
+        break;
+      }
+      case JS_NULL: {
         jobject oParameterMetadata = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.getParameterMetaData);
-        CHECK_EXCEPTION
+        CHECK_EXCEPTION;
         int parameterType = env->CallIntMethod(oParameterMetadata, jParameterMetadata.getParameterType, index);
-        CHECK_EXCEPTION
+        CHECK_EXCEPTION;
         env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setNull, index, parameterType);
-        CHECK_EXCEPTION
-      default: // STRING
-        jstring val =  env->NewStringUTF(value.getStringValue().c_str());
-        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setString, index, val);
-      break;
+        CHECK_EXCEPTION;
+        break;
+      }
+      default: { // STRING
+        jstring stringval =  env->NewStringUTF(value.getStringValue().c_str());
+        env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setString, index, stringval);
+        break;
+      }
     }
     CHECK_EXCEPTION
   JDBC_MODULE_CATCH
@@ -80,4 +86,4 @@ SetNumericFunction::evaluate(const ExternalFunction::Arguments_t& args,
   return ItemSequence_t(new EmptySequence());
 }
 
-}}; // namespace zorba, jdbc
+}} // namespace zorba, jdbc
