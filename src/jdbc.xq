@@ -162,6 +162,13 @@ declare %an:sequential function jdbc:set-null(
                                      $prepared-statement as xs:anyURI,
                                      $parameter-index as xs:integer) as empty-sequence() external;
 (:
+ :  5.2.5 Set the value of the designated parameter with the given value.
+ :)
+declare %an:sequential function jdbc:set-value(
+                                     $prepared-statement as xs:anyURI, 
+                                     $parameter-index as xs:decimal, 
+                                     $value as xs:anyAtomicType) as empty-sequence() external;
+(:
  :  5.3 Clears the current parameter values immediately.
  :)
 declare %an:sequential function jdbc:clear-params(

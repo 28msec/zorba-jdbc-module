@@ -43,7 +43,7 @@ SetNullFunction::evaluate(const ExternalFunction::Arguments_t& args,
     int parameterType = env->CallIntMethod(oParameterMetadata, jParameterMetadata.getParameterType, index);
     CHECK_EXCEPTION
 
-      env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setNull, index, parameterType);
+    env->CallVoidMethod(oPreparedStatement, jPreparedStatement.setNull, index, parameterType);
     CHECK_EXCEPTION
 
   JDBC_MODULE_CATCH
