@@ -40,8 +40,26 @@ IF (zorba_util-jvm_module_FOUND)
     INCLUDE ("${Zorba_USE_FILE}")
 
     ADD_SUBDIRECTORY ("src")
-    #ADD_SUBDIRECTORY ("srcJava")
-    ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
+
+    # Attempt to find the MySQL JDBC connector module (for tests).
+    IF (WIN32)
+      # No default paths; use CMAKE_PREFIX_PATH
+      SET (MYSQL_CONN_PATH "")
+    ELSE (WIN32)
+      SET (MYSQL_CONN_PATH /usr/share/java ${Java_LIBRARIES})
+    ENDIF (WIN32)
+    ZORBA_FIND_JAR (MYSQL_CONN_JAR NAMES mysql-connector-java mysql
+      PATHS ${MYSQL_CONN_PATH})
+    IF (MYSQL_CONN_JAR)
+      MESSAGE (STATUS "MySQL connector .jar found; adding JDBC module tests.")
+      DECLARE_ZORBA_JAR (FILE ${MYSQL_CONN_JAR} EXTERNAL)
+      # Only add the tests if we found it, since they depend on MySQL.
+      ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
+    ELSE (MYSQL_CONN_JAR)
+      MESSAGE (STATUS "MySQL connector .jar not found; skipping tests "
+	"for JDBC module.")
+    ENDIF (MYSQL_CONN_JAR)
+
     DONE_DECLARING_ZORBA_URIS ()
 
   ELSE (JNI_FOUND)
