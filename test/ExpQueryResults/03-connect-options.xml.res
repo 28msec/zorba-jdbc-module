@@ -1,0 +1,1 @@
+{ "autocommit" : true, "readonly" : false, "isolation-level" : "REPEATABLE-READ" }

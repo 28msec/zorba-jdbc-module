@@ -1,0 +1,1 @@
+{ "columns" : [ { "name" : "java.lang.String", "type" : "VARCHAR" } ] }
