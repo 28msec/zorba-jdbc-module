@@ -43,8 +43,8 @@ IF (zorba_util-jvm_module_FOUND)
 
     # Attempt to find the MySQL JDBC connector module (for tests).
     IF (WIN32)
-      # No default paths; use CMAKE_PREFIX_PATH
-      SET (MYSQL_CONN_PATH "")
+      # getting connector from env var CONNECTOR_PATH
+      STRING(REGEX REPLACE "\\\\" "/" MYSQL_CONN_PATH "$ENV{CONNECTOR_PATH}")
     ELSE (WIN32)
       SET (MYSQL_CONN_PATH /usr/share/java ${Java_LIBRARIES})
     ENDIF (WIN32)
