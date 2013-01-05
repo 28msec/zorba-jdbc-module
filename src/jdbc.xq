@@ -42,7 +42,7 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  :)
 
 (:
- : Opens a connection to a relational database.
+ : 2.1 Opens a connection to a relational database.
  : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
  :
  : @param $connection-config
@@ -56,7 +56,16 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object() ) as xs:anyURI external;
 (:
- :  Opens a connection to a relational database with specified options.
+ : 2.1 Opens a connection to a relational database with specified options.
+ : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
+ :
+ : @param $connection-config
+ : In detail, the $connection-config is specified as follows:
+ : { "url" : xs:string, 
+ :   "user"? : xs:string,
+ :   "password"? : xs:string }
+ : 
+ : @error 
  :)
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object(), 

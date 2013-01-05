@@ -181,6 +181,18 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
 }
 
 void
+JdbcModule::throwMapError(String aMap)
+{
+      if (aMap == INSTANCE_MAP_CONNECTIONS) {
+        throwError("SQL08003", "Connection does not exist.");
+      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
+        throwError("SQL003", "Statement does not exist.");
+      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
+        throwError("SQL003", "Prepared statement does not exist.");
+      }
+}
+
+void
 JdbcModule::throwError(const char *aLocalName, const char* aErrorMessage)
 {
   String errDescription(aErrorMessage);
@@ -282,55 +294,23 @@ InstanceMap*
 
 jobject 
   JdbcModule::getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap) {
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, aMap);
+    InstanceMap* lInstanceMap = getCreateInstanceMap(aDynamincContext, aMap);
     if (lInstanceMap==NULL)
-    { 
-      if (aMap == INSTANCE_MAP_CONNECTIONS) {
-        JdbcModule::throwError("SQL08003", "Connection does not exist.");
-      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
-        JdbcModule::throwError("SQL003", "Statement does not exist.");
-      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
-        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-      }
-    }
+      throwMapError(aMap);
     jobject oResult = lInstanceMap->getInstance(aObjectUUID);
     if(oResult==NULL)
-    {
-      if (aMap == INSTANCE_MAP_CONNECTIONS) {
-        JdbcModule::throwError("SQL08003", "Connection does not exist.");
-      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
-        JdbcModule::throwError("SQL003", "Statement does not exist.");
-      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
-        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-      }
-    }
+      throwMapError(aMap);
     return oResult;
 }
 
 void 
   JdbcModule::deleteObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap) {
-    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, aMap);
+    InstanceMap* lInstanceMap = getCreateInstanceMap(aDynamincContext, aMap);
     if (lInstanceMap==NULL)
-    { 
-      if (aMap == INSTANCE_MAP_CONNECTIONS) {
-        JdbcModule::throwError("SQL08003", "Connection does not exist.");
-      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
-        JdbcModule::throwError("SQL003", "Statement does not exist.");
-      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
-        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-      }
-    }
+      throwMapError(aMap);
     jobject oResult = lInstanceMap->getInstance(aObjectUUID);
     if(oResult==NULL)
-    {
-      if (aMap == INSTANCE_MAP_CONNECTIONS) {
-        JdbcModule::throwError("SQL08003", "Connection does not exist.");
-      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
-        JdbcModule::throwError("SQL003", "Statement does not exist.");
-      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
-        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
-      }
-    }
+      throwMapError(aMap);
     lInstanceMap->deleteInstance(aObjectUUID);
     JDBC_MODULE_TRY
     env->DeleteLocalRef(oResult);

@@ -111,6 +111,8 @@ class JdbcModule : public ExternalModule {
     static void 
       throwJavaException(JNIEnv *env, jthrowable& lException);
     static void
+      throwMapError(String aMap);
+    static void
       throwError (const char *aLocalName, const char* aErrorMessage);
     static void
       throwError(const char *aLocalName, String aErrorMessage);
@@ -123,7 +125,7 @@ class JdbcModule : public ExternalModule {
     static jobject 
       getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
     static void 
-      JdbcModule::deleteObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
+      deleteObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
 
 };
 
