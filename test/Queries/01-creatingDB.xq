@@ -1,7 +1,7 @@
 import module namespace jdbc = "http://www.zorba-xquery.com/modules/jdbc";
 
 variable $connection := jdbc:connect({
-  "url": "jdbc:mysql://localhost/",
+  "url": "jdbc:mysql://localhost:3077/",
   "user" : "root",
   "password" : ""});
 
