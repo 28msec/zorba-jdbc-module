@@ -122,6 +122,8 @@ class JdbcModule : public ExternalModule {
       getCreateInstanceMap(const zorba::DynamicContext* aDynamincContext, String mapName);
     static jobject 
       getObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
+    static void 
+      JdbcModule::deleteObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap);
 
 };
 

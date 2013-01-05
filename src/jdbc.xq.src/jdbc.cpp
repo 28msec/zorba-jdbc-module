@@ -307,6 +307,37 @@ jobject
     return oResult;
 }
 
+void 
+  JdbcModule::deleteObject(const zorba::DynamicContext* aDynamincContext, String aObjectUUID, String aMap) {
+    InstanceMap* lInstanceMap = JdbcModule::getCreateInstanceMap(aDynamincContext, aMap);
+    if (lInstanceMap==NULL)
+    { 
+      if (aMap == INSTANCE_MAP_CONNECTIONS) {
+        JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
+        JdbcModule::throwError("SQL003", "Statement does not exist.");
+      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
+        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      }
+    }
+    jobject oResult = lInstanceMap->getInstance(aObjectUUID);
+    if(oResult==NULL)
+    {
+      if (aMap == INSTANCE_MAP_CONNECTIONS) {
+        JdbcModule::throwError("SQL08003", "Connection does not exist.");
+      } else if (aMap == INSTANCE_MAP_STATEMENTS) {
+        JdbcModule::throwError("SQL003", "Statement does not exist.");
+      } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
+        JdbcModule::throwError("SQL003", "Prepared statement does not exist.");
+      }
+    }
+    lInstanceMap->deleteInstance(aObjectUUID);
+    JDBC_MODULE_TRY
+    env->DeleteLocalRef(oResult);
+    CHECK_EXCEPTION
+    JDBC_MODULE_CATCH
+}
+
 void JdbcModule::initGlobals(const zorba::StaticContext* aStaticContext) {
   if (env!=NULL) 
     return;

@@ -187,6 +187,11 @@ declare function jdbc:execute-query-prepared(
  :)
 declare function jdbc:execute-update-prepared(
                       $prepared-statement as xs:anyURI) as xs:integer external;
+(:
+ :  5.8 Closes and frees from memory any prepared SQL statement created with jdbc:prepare-statement
+ :)
+declare %an:sequential function jdbc:close-prepared(
+                      $prepared-statement as xs:anyURI) as empty-sequence() external;
 
 
 (:
@@ -208,4 +213,8 @@ declare function jdbc:metadata(
  :)
 declare function jdbc:affected-rows(
                       $dataset-id as xs:anyURI) as xs:integer external;
-
+(:
+ :  6.4 Closes a DataSet.
+ :)
+declare %an:sequential function jdbc:close-dataset(
+                      $dataset-id as xs:anyURI) as empty-sequence() external;

@@ -80,6 +80,22 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
           elements.push_back(itemFactory->createJSONObject(column));
           env->ReleaseStringUTFChars(oType, cType);
           CHECK_EXCEPTION 
+
+          bool isAutoIncrement = (JNI_TRUE == env->CallBooleanMethod(oMetadata, jResultSetMetadata.isAutoIncrement, i));
+          CHECK_EXCEPTION
+          std::pair<zorba::Item, zorba::Item> pAutoIncrement(itemFactory->createString("autoincrement"), itemFactory->createBoolean(isAutoIncrement));
+          column.push_back(pAutoIncrement);
+          elements.push_back(itemFactory->createJSONObject(column));
+          CHECK_EXCEPTION 
+
+          jint isNullable = env->CallIntMethod(oMetadata, jResultSetMetadata.isNullable, i);
+          CHECK_EXCEPTION
+          if (isNullable != jResultSetMetadata.COLUMN_NULLABLE_UNKNOWN) {
+            std::pair<zorba::Item, zorba::Item> pAutoIncrement(itemFactory->createString("nullable"), itemFactory->createBoolean(isNullable==jResultSetMetadata.COLUMN_NULLABLE));
+            column.push_back(pAutoIncrement);
+            elements.push_back(itemFactory->createJSONObject(column));
+            CHECK_EXCEPTION 
+          }
       }
       std::pair<zorba::Item, zorba::Item> allColumns(itemFactory->createString("columns"), itemFactory->createJSONArray(elements));
       vResult.push_back(allColumns);

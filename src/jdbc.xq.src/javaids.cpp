@@ -78,6 +78,12 @@ namespace jdbc
     getColumnType = env->GetMethodID(classID, "getColumnType", "(I)I");
     getColumnName = env->GetMethodID(classID, "getColumnName", "(I)Ljava/lang/String;");
     getColumnTypeName = env->GetMethodID(classID, "getColumnTypeName", "(I)Ljava/lang/String;");
+    isAutoIncrement = env->GetMethodID(classID, "isAutoIncrement", "(I)Z");
+    isNullable = env->GetMethodID(classID, "isNullable", "(I)I");
+
+    COLUMN_NO_NULLS = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNoNulls", "I"));
+    COLUMN_NULLABLE = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNullable", "I"));
+    COLUMN_NULLABLE_UNKNOWN = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNullableUnknown", "I"));
     return true;
   }
   bool JavaPreparedStatement::init() {

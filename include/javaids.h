@@ -86,6 +86,12 @@ public:
   jmethodID getColumnType;
   jmethodID getColumnName;
   jmethodID getColumnTypeName;
+  jmethodID isAutoIncrement;
+  jmethodID isNullable;
+
+  int COLUMN_NO_NULLS;
+  int COLUMN_NULLABLE;
+  int COLUMN_NULLABLE_UNKNOWN;
 };
 class JavaPreparedStatement {
 public:

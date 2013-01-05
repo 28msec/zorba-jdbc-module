@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#include "disconnect.h"
+#include "closeprepared.h"
 #include "jdbc.h"
+#include <zorba/singleton_item_sequence.h>
 
 namespace zorba
 {
@@ -24,30 +25,15 @@ namespace jdbc
 
 
 ItemSequence_t
-DisconnectFunction::evaluate(const ExternalFunction::Arguments_t& args,
+ClosePreparedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
   CHECK_CONNECTION
-
-  String lStrUUID = JdbcModule::getStringArg(args, 0);
-
-  JDBC_MODULE_TRY
-
-    jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
-
-    jboolean isClosed = env->CallBooleanMethod(oConnection, jConnection.isClosed);
-    CHECK_EXCEPTION
-    if (isClosed==JNI_TRUE) {
-      JdbcModule::throwError("SQL08008", "Connection already closed.");
-    }
-
-    env->CallVoidMethod(oConnection, jConnection.close);
-    CHECK_EXCEPTION
-
-  JDBC_MODULE_CATCH
   
-  JdbcModule::deleteObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
+  String lStatementUUID = JdbcModule::getStringArg(args, 0);
+
+  JdbcModule::deleteObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
   return ItemSequence_t(new EmptySequence());
 }
