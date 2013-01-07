@@ -188,7 +188,7 @@ JdbcModule::throwMapError(String aMap)
       } else if (aMap == INSTANCE_MAP_STATEMENTS) {
         throwError("SQL003", "Statement does not exist.");
       } else if (aMap == INSTANCE_MAP_PREPAREDSTATEMENTS) {
-        throwError("SQL003", "Prepared statement does not exist.");
+        throwError("SQL008", "Prepared statement does not exist.");
       }
 }
 
