@@ -50,12 +50,12 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  : @option "user" username for the server, this is optional.
  : @option "password" password for the server, this is optional.
  :
- : @error SQL28000 Authentication failed
- : @error SQL08001 Connection error
- : @error SQL40003 Isolation level not supported
- : @error SQL001 Descriptive error, see attached message
+ : @error SQL28000 Authentication failed.
+ : @error SQL08001 Connection error.
+ : @error SQL40003 Isolation level not supported.
+ : @error SQL001 Descriptive error, see attached message.
  :
- : @return Return an identifier for the server.
+ : @return Return an identifier that represents the connection to the server.
  :
  : Connection coonfiguration example:
  : { "url" : "jdbc:mysql://localhost/", 
@@ -74,18 +74,31 @@ declare %an:sequential function jdbc:connect(
  : @option "url" URL of the server, this option must be specified and should be declared according to JDBC specification.
  : @option "user" username for the server, this option is optional.
  : @option "password" password for the server, this option is optional.
+ : @param $options json object that specifies the connection options.
+ : @option "autocommit" The created connection will have autocommit turned on if the value the attribute is set to "true".
+ : @option "readonly" The created connection will be readonly if the value of the attribute is set to "true".
+ : @option "isolation-level" The created connection will have the specified transaction isolation level, 
+ : the following string typed in-scope variables represent the different transaction isolation levels 
+ : that this attribute can be set to:
+ : - $jsql:READ-COMMITTED
+ : - $jsql:READ-UNCOMMITTED
+ : - $jsql:REPEATABLE-READ
+ : - $jsql:SERIALIZABLE
+ : if no isolation level is provided by the user the connection will be created with the default 
+ : isolation level of the database.
  :
- : @error SQL28000 Authentication failed
- : @error SQL08001 Connection error
- : @error SQL40003 Isolation level not supported
- : @error SQL001 Descriptive error, see error in attached message
  :
- : @return Return an identifier for the server.
+ : @error SQL28000 Authentication failed.
+ : @error SQL08001 Connection error.
+ : @error SQL40003 Isolation level not supported.
+ : @error SQL001 Descriptive error, see error in attached message.
  :
- : Connection coonfiguration example:
- : { "url" : "jdbc:mysql://localhost/", 
- :   "user"? : "root",
- :   "password"? : "" }
+ : @return Return an identifier that represents the connection to the server.
+ :
+ : Connection options example:
+ : { "autocommit" : false, 
+ :   "readonly"? : true,
+ :   "isolation-level"? : $jdbc:READ-COMMITTED }
  : 
  :)
 declare %an:sequential function jdbc:connect(
@@ -100,17 +113,21 @@ declare %an:sequential function jdbc:connect(
  : @error SQL08003 Connection doesn't exist
  : @error SQL01002 Disconnection failed
  : @error SQL001 Descriptive error, see error in attached message
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:disconnect(
                                      $connection-id as xs:anyURI) as empty-sequence() external;
 
 (:~
- : 2.3 Verify if a connection is still active, returns true if connected.
+ : 2.3 Verify if a connection is still active.
  :
  : @param $connection-id The identifier to the connection to be verify.
  :
  : @error SQL08003 Connection doesn't exist
  : @error SQL001 Descriptive error, see error in attached message
+ :
+ : @return Returns true if connected.
  :)
 declare function jdbc:is-connected(
                                      $connection-id as xs:anyURI) as xs:boolean external;
@@ -123,6 +140,14 @@ declare function jdbc:is-connected(
  : @error SQL08003 Connection doesn't exist
  : @error SQL08000 Connection is closed
  : @error SQL001 Descriptive error, see error in attached message
+ :
+ : @return Returns and object with the connection options.
+ : The returned options are equal to the options specified in function jdbc:connect. 
+ : Consequently, the options are specified as follows:
+ :    { "autocommit" : xs:boolean,
+ :      "readonly" : xs:boolean,
+ :      "isolation-level" : xs:string }
+ :
  :)
 declare function jdbc:connection-options(
                                       $connection-id as xs:anyURI) as object() external;
@@ -139,6 +164,8 @@ declare function jdbc:connection-options(
  : @error SQL08003 Connection doesn't exist
  : @error SQL08000 Connection is closed
  : @error SQL001 Descriptive error, see error in attached message
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:commit(
                                       $connection-id as xs:anyURI) as empty-sequence() external;
@@ -151,6 +178,8 @@ declare %an:sequential function jdbc:commit(
  : @error SQL08003 Connection doesn't exist
  : @error SQL08000 Connection is closed
  : @error SQL001 Descriptive error, see error in attached message
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:rollback(
                                       $connection-id as xs:anyURI) as empty-sequence() external;
@@ -169,13 +198,15 @@ declare %an:sequential function jdbc:rollback(
  : @error SQL08003 Connection doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an identifier that represents a DataSet.
  :)
 declare %an:sequential function jdbc:execute( 
                                       $connection-id as xs:anyURI,
                                       $sql as xs:string ) as xs:anyURI external;
 
 (:~
- : 4.2 Executes read-only SQL statements.
+ : 4.2 Executes non-updating SQL statements.
  :
  : @param $connection-id The identifier to an active connection.
  : @param $sql The query string to be executed.
@@ -184,6 +215,12 @@ declare %an:sequential function jdbc:execute(
  : @error SQL08000 Connection is closed.
  : @error SQL005 The statement is Updating type.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :
  :)
 declare function jdbc:execute-query( 
                                       $connection-id as xs:anyURI, 
@@ -199,7 +236,9 @@ declare function jdbc:execute-query(
  : @error SQL08000 Connection is closed.
  : @error SQL005 The statement is Read-only type.
  : @error SQL001 Descriptive error, see error in attached message.
-:)
+ :
+ : @return Returns an xs:integer with the number of affected rows.
+ :)
 declare function jdbc:execute-update(
                                       $connection-id as xs:anyURI,
                                       $sql as xs:string) as xs:integer external;
@@ -219,6 +258,8 @@ declare function jdbc:execute-update(
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
  :
+ : @return Return an identifier that represents the prepared statement.
+ :
  : Example:
  : jsql:prepare-statement($connection, "SELECT * FROM users WHERE id=? AND age>?")
  :)
@@ -237,6 +278,8 @@ declare %an:sequential function jdbc:prepare-statement(
  : @error SQL007 Parameter casting error.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:set-numeric(
                                       $prepared-statement as xs:anyURI, 
@@ -254,7 +297,9 @@ declare %an:sequential function jdbc:set-numeric(
  : @error SQL007 Parameter casting error.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
-:)
+ :
+ : @return This function returns an empty-sequence()
+ :)
 declare %an:sequential function jdbc:set-string(
                                       $prepared-statement as xs:anyURI,
                                       $parameter-index as xs:integer,
@@ -271,6 +316,8 @@ declare %an:sequential function jdbc:set-string(
  : @error SQL007 Parameter casting error.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:set-boolean(
                                       $prepared-statement as xs:anyURI, 
@@ -282,12 +329,13 @@ declare %an:sequential function jdbc:set-boolean(
  :
  : @param $prepared-statement The identifier to a prepared statement.
  : @param $parameter-index The index from the parameter to be set.
- : @param $value The value to be set.
  : 
  : @error SQL003 Prepared statement doesn't exist.
  : @error SQL007 Parameter casting error.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:set-null(
                                       $prepared-statement as xs:anyURI,
@@ -306,6 +354,8 @@ declare %an:sequential function jdbc:set-null(
  : @error SQL007 Parameter casting error.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:set-value(
                                       $prepared-statement as xs:anyURI, 
@@ -320,6 +370,8 @@ declare %an:sequential function jdbc:set-value(
  : @error SQL003 Prepared statement doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:clear-params(
                                       $prepared-statement as xs:anyURI) as empty-sequence() external;
@@ -332,6 +384,18 @@ declare %an:sequential function jdbc:clear-params(
  : @error SQL003 Prepared statement doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns the parameters metadata associated with a prepared statement. 
+ : In other words, it returns information about the column name associated with the parameter, the type, etc.
+ : The metadata node returned by this function is defined as follows:
+ :   {
+ :     columns: [{
+ :       "name": xs:string,
+ :       "type": xs:string
+ :       }]
+ :   }
+ : @option "name" The name of the column.
+ : @option "type" The SQL type of the column.
  :)
 declare function jdbc:parameter-metadata(
                                       $prepared-statement as xs:anyURI) as object() external;
@@ -358,6 +422,11 @@ declare %an:sequential function jdbc:execute-prepared(
  : @error SQL005 The prepared statement is an updating query.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query processed with the parameter values provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
  :)
 declare function jdbc:execute-query-prepared(
                                       $prepared-statement as xs:anyURI) as object()* external;
@@ -371,6 +440,8 @@ declare function jdbc:execute-query-prepared(
  : @error SQL006 The prepared statement is a non-updating query.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Returns an xs:integer with the number of affected rows.
  :)
 declare function jdbc:execute-update-prepared(
                                       $prepared-statement as xs:anyURI) as xs:integer external;
@@ -383,6 +454,8 @@ declare function jdbc:execute-update-prepared(
  : @error SQL003 Prepared statement doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:close-prepared(
                                       $prepared-statement as xs:anyURI) as empty-sequence() external;
@@ -400,6 +473,11 @@ declare %an:sequential function jdbc:close-prepared(
  : @error SQL008 DataSet doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the DataSet provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
  :)
 declare function jdbc:result-set(
                                       $dataset-id as xs:anyURI) as object()* external;
@@ -412,6 +490,25 @@ declare function jdbc:result-set(
  : @error SQL008 DataSet doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns the metadata associated with an executed DataSet. More in detail, it returns information about column names, types, and whether a column can contain a null value.
+ : The metadata information can only be returned for DataSets that have been executed explicitly using the jsql:execute function.
+ : 
+ : The metadata node returned by this function is defined as follows:
+ : {
+ :   "columns": [ {
+ :       "name": xs:string,
+ :       "type": xs:string,
+ :       "autoincrement"? = xs:boolean,
+ :       "nillable"? = xs:boolean } * ]
+ : }
+ : @option "name" The name of the column.
+ : @option "type" The SQL type of the column.
+ : @option "autoincrement" is true if this column is automatically maintained.
+ : @option "nillable" If the colums can contain NULL values this attribute will be set to true.
+ :
+ : If the query is an updating query, then the result object will return the number of affected rows like:
+ : { "affectedrows": xs:integer }
  :)
 declare function jdbc:metadata(
                                       $dataset-id as xs:anyURI) as object() external;
@@ -424,6 +521,8 @@ declare function jdbc:metadata(
  : @error SQL008 DataSet doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Returns an xs:integer with the number of affected rows.
  :)
 declare function jdbc:affected-rows(
                                       $dataset-id as xs:anyURI) as xs:integer external;
@@ -436,6 +535,8 @@ declare function jdbc:affected-rows(
  : @error SQL008 DataSet doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return This function returns an empty-sequence()
  :)
 declare %an:sequential function jdbc:close-dataset(
                                       $dataset-id as xs:anyURI) as empty-sequence() external;
