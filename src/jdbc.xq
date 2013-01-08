@@ -41,7 +41,7 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  : 2 CONNECTION HANDLING
  :)
 
-(:
+(:~
  : 2.1 Opens a connection to a database.
  : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
  :
@@ -65,7 +65,8 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  :)
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object() ) as xs:anyURI external;
-(:
+
+(:~
  : 2.1 Opens a connection to a database with specified options.
  : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
  :
@@ -90,7 +91,8 @@ declare %an:sequential function jdbc:connect(
 declare %an:sequential function jdbc:connect(
                                      $connection-config as object(), 
                                      $options as object()?) as xs:anyURI external;
-(:
+
+(:~
  : 2.2 Closes an open database connection.
  :
  : @param $connection-id The identifier to connection to be closed.
@@ -101,7 +103,8 @@ declare %an:sequential function jdbc:connect(
  :)
 declare %an:sequential function jdbc:disconnect(
                                      $connection-id as xs:anyURI) as empty-sequence() external;
-(:
+
+(:~
  : 2.3 Verify if a connection is still active, returns true if connected.
  :
  : @param $connection-id The identifier to the connection to be verify.
@@ -111,7 +114,8 @@ declare %an:sequential function jdbc:disconnect(
  :)
 declare function jdbc:is-connected(
                                      $connection-id as xs:anyURI) as xs:boolean external;
-(:
+
+(:~
  : 2.4 Returns a set with options for a specified connection.
  :
  : @param $connection-id The identifier to the connection to be verify.
@@ -123,12 +127,11 @@ declare function jdbc:is-connected(
 declare function jdbc:connection-options(
                                       $connection-id as xs:anyURI) as object() external;
 
-
 (:
  : 3 TRANSACTIONS
  :)
 
-(:
+(:~
  : 3.1 Commit current transaction from an active connection.
  :
  : @param $connection-id The identifier to the connection to be commited.
@@ -139,7 +142,8 @@ declare function jdbc:connection-options(
  :)
 declare %an:sequential function jdbc:commit(
                                       $connection-id as xs:anyURI) as empty-sequence() external;
-(:
+
+(:~
  :  3.2 Rollback the current transaction of a connection.
  :
  : @param $connection-id The identifier to the connection to be rollbacked.
@@ -156,7 +160,7 @@ declare %an:sequential function jdbc:rollback(
  : 4 SIMPLE STATEMENTS
  :)
 
-(:
+(:~
  : 4.1 Executes any kind of SQL statement. 
  :
  : @param $connection-id The identifier to an active connection.
@@ -169,7 +173,8 @@ declare %an:sequential function jdbc:rollback(
 declare %an:sequential function jdbc:execute( 
                                       $connection-id as xs:anyURI,
                                       $sql as xs:string ) as xs:anyURI external;
-(:
+
+(:~
  : 4.2 Executes read-only SQL statements.
  :
  : @param $connection-id The identifier to an active connection.
@@ -183,7 +188,8 @@ declare %an:sequential function jdbc:execute(
 declare function jdbc:execute-query( 
                                       $connection-id as xs:anyURI, 
                                       $sql as xs:string) as object()* external;
-(:
+
+(:~
  : 4.3 Executes updating SQL statements.
  :
  : @param $connection-id The identifier to an active connection.
@@ -203,7 +209,7 @@ declare function jdbc:execute-update(
  :  5 PREPARED STATEMENTS
  :)
 
-(:
+(:~
  :  5.1 Creates a prepared statement for multiple executions with diferent values.
  :
  : @param $connection-id The identifier to an active connection.
@@ -219,7 +225,8 @@ declare function jdbc:execute-update(
 declare %an:sequential function jdbc:prepare-statement(
                                       $connection-id as xs:anyURI,
                                       $sql as xs:string) as xs:anyURI external;
-(:
+
+(:~
  : 5.2.1 Set the value of the designated parameter with the given value, this function will assign only numeric values.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -235,7 +242,8 @@ declare %an:sequential function jdbc:set-numeric(
                                       $prepared-statement as xs:anyURI, 
                                       $parameter-index as xs:decimal, 
                                       $value as xs:anyAtomicType) as empty-sequence() external;
-(:
+
+(:~
  : 5.2.2 Set the value of the designated parameter with the given value, this function will assign only string values.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -251,7 +259,8 @@ declare %an:sequential function jdbc:set-string(
                                       $prepared-statement as xs:anyURI,
                                       $parameter-index as xs:integer,
                                       $value as xs:string) as empty-sequence() external;
-(:
+
+(:~
  : 5.2.3 Set the value of the designated parameter with the given value, this function will assign only boolean values.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -267,7 +276,8 @@ declare %an:sequential function jdbc:set-boolean(
                                       $prepared-statement as xs:anyURI, 
                                       $parameter-index as xs:integer,
                                       $value as xs:boolean) as empty-sequence() external;
-(:
+
+(:~
  : 5.2.4 Set the value of the designated parameter with the given value, this function will assign only null values if possible.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -282,7 +292,8 @@ declare %an:sequential function jdbc:set-boolean(
 declare %an:sequential function jdbc:set-null(
                                       $prepared-statement as xs:anyURI,
                                       $parameter-index as xs:integer) as empty-sequence() external;
-(:
+
+(:~
  : 5.2.5 Set the value of the designated parameter with the given value, 
  : this function will assign any value you send 
  : and it will try to cast to the correct type.
@@ -300,7 +311,8 @@ declare %an:sequential function jdbc:set-value(
                                       $prepared-statement as xs:anyURI, 
                                       $parameter-index as xs:decimal, 
                                       $value as xs:anyAtomicType) as empty-sequence() external;
-(:
+
+(:~
  : 5.3 Clears the current parameter values immediately.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -311,7 +323,8 @@ declare %an:sequential function jdbc:set-value(
  :)
 declare %an:sequential function jdbc:clear-params(
                                       $prepared-statement as xs:anyURI) as empty-sequence() external;
-(:
+
+(:~
  : 5.4 Retrieves the number, types and properties of the prepared statement parameters.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -322,7 +335,8 @@ declare %an:sequential function jdbc:clear-params(
  :)
 declare function jdbc:parameter-metadata(
                                       $prepared-statement as xs:anyURI) as object() external;
-(:
+
+(:~
  : 5.5 Executes SQL statements prepared with 5.1 jsql:prepare-statement with values set
  : and returns and identifier to a Dataset.
  :
@@ -334,7 +348,8 @@ declare function jdbc:parameter-metadata(
  :)
 declare %an:sequential function jdbc:execute-prepared(
                                       $prepared-statement as xs:anyURI) as xs:anyURI external;
-(:
+
+(:~
  : 5.6 Executes a non-updating SQL statement prepared with 5.1 jsql:prepare-statement.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -346,7 +361,8 @@ declare %an:sequential function jdbc:execute-prepared(
  :)
 declare function jdbc:execute-query-prepared(
                                       $prepared-statement as xs:anyURI) as object()* external;
-(:
+
+(:~
  : 5.7 Executes an updating SQL statement prepared with 5.1 jsql:prepare-statement.
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -358,7 +374,8 @@ declare function jdbc:execute-query-prepared(
  :)
 declare function jdbc:execute-update-prepared(
                                       $prepared-statement as xs:anyURI) as xs:integer external;
-(:
+
+(:~
  : 5.8 Closes and frees from memory any prepared SQL statement created with jdbc:prepare-statement
  :
  : @param $prepared-statement The identifier to a prepared statement.
@@ -375,7 +392,7 @@ declare %an:sequential function jdbc:close-prepared(
  :  6 DATASETS
  :)
 
-(:
+(:~
  : 6.1 This function returns a sequence of objects representing the rows of data from a non-updating query.
  :
  : @param $dataset-id The identifier to a DataSet.
@@ -386,7 +403,8 @@ declare %an:sequential function jdbc:close-prepared(
  :)
 declare function jdbc:result-set(
                                       $dataset-id as xs:anyURI) as object()* external;
-(:
+
+(:~
  : 6.2 Return the metadata of the result of a particular DataSet.
  :
  : @param $dataset-id The identifier to a DataSet.
@@ -397,7 +415,8 @@ declare function jdbc:result-set(
  :)
 declare function jdbc:metadata(
                                       $dataset-id as xs:anyURI) as object() external;
-(:
+
+(:~
  : 6.3 Return the number of affected rows of a particular DataSet.
  :
  : @param $dataset-id The identifier to a DataSet.
@@ -408,7 +427,8 @@ declare function jdbc:metadata(
  :)
 declare function jdbc:affected-rows(
                                       $dataset-id as xs:anyURI) as xs:integer external;
-(:
+
+(:~
  : 6.4 Closes and free resources from a particular DataSet.
  :
  : @param $dataset-id The identifier to a DataSet.
