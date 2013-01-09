@@ -31,7 +31,6 @@
 
 #include "connect.h"
 #include "connectionoptions.h"
-#include "disconnect.h"
 #include "isconnected.h"
 #include "commit.h"
 #include "rollback.h"
@@ -86,10 +85,6 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ConnectFunction(this);
     }
-    /*else if (localName == "disconnect")
-    {
-      lFunc = new DisconnectFunction(this);
-    }*/
     else if (localName == "is-connected")
     {
       lFunc = new IsConnectedFunction(this);
