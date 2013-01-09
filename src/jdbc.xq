@@ -31,10 +31,25 @@ declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare namespace an = "http://www.zorba-xquery.com/annotations";
 declare option ver:module-version "1.0";
 
+(:~
+ : This variable represents the NOT-SUPPORTED level for Isolation Levels in $options for 2.2 connect function.
+ :)
 declare variable $jdbc:NOT-SUPPORTED    := "NOT-SUPPORTED";
+(:~
+ : This variable represents the READ-COMMITTED level for Isolation Levels in $options for 2.2 connect function.
+ :)
 declare variable $jdbc:READ-COMMITTED   := "READ-COMMITTED";
+(:~
+ : This variable represents the READ-UNCOMMITTED level for Isolation Levels in $options for 2.2 connect function.
+ :)
 declare variable $jdbc:READ-UNCOMMITTED := "READ-UNCOMMITTED";
+(:~
+ : This variable represents the REPEATABLE-READ level for Isolation Levels in $options for 2.2 connect function.
+ :)
 declare variable $jdbc:REPEATABLE-READ  := "REPEATABLE-READ";
+(:~
+ : This variable represents the SERIALIZABLE level for Isolation Levels in $options for 2.2 connect function.
+ :)
 declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
 
 (:
@@ -388,13 +403,15 @@ declare function jdbc:parameter-metadata(
 
 (:~
  : 5.5 Executes SQL statements prepared with 5.1 jsql:prepare-statement with values set
- : and returns and identifier to a Dataset.
+ : and returns an identifier to a Dataset.
  :
  : @param $prepared-statement The identifier to a prepared statement.
  : 
  : @error SQL003 Prepared statement doesn't exist.
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an identifier that represents a DataSet.
  :)
 declare %an:sequential function jdbc:execute-prepared(
                                       $prepared-statement as xs:anyURI) as xs:anyURI external;
