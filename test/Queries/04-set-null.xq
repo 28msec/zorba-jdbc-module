@@ -19,5 +19,5 @@ jdbc:set-null($prep-stat,1);
 variable $metadata := jdbc:parameter-metadata($prep-stat);
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); $metadata }
+ then { $metadata }
  else false()

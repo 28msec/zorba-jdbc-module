@@ -43,6 +43,7 @@
 #include "executeprepared.h"
 #include "executequeryprepared.h"
 #include "executeupdateprepared.h"
+#include "closeprepared.h"
 #include "parametermetadata.h"
 #include "preparestatement.h"
 #include "setboolean.h"
@@ -53,6 +54,7 @@
 #include "affectedrows.h"
 #include "metadata.h"
 #include "resultset.h"
+#include "closedataset.h"
 
 
 namespace zorba
@@ -84,10 +86,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ConnectFunction(this);
     }
-    else if (localName == "disconnect")
+    /*else if (localName == "disconnect")
     {
       lFunc = new DisconnectFunction(this);
-    }
+    }*/
     else if (localName == "is-connected")
     {
       lFunc = new IsConnectedFunction(this);
@@ -163,6 +165,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ExecuteUpdatePreparedFunction(this);
     }
+    else if (localName == "close-prepared")
+    {
+      lFunc = new ClosePreparedFunction(this);
+    }
     // 6 DATASETS
     else if (localName == "result-set")
     {
@@ -175,6 +181,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     else if (localName == "affected-rows")
     {
       lFunc = new AffectedRowsFunction(this);
+    }
+    else if (localName == "close-dataset")
+    {
+      lFunc = new CloseDataSetFunction(this);
     }
   }
   return lFunc;
@@ -287,6 +297,7 @@ InstanceMap*
   if (!(result = dynamic_cast<InstanceMap*>(lDctx->getExternalFunctionParameter(mapName))))
   {
     result = new InstanceMap();
+    result->id = mapName;
     lDctx->addExternalFunctionParameter(mapName, result);
   }
   return result;
@@ -312,10 +323,6 @@ void
     if(oResult==NULL)
       throwMapError(aMap);
     lInstanceMap->deleteInstance(aObjectUUID);
-    JDBC_MODULE_TRY
-    env->DeleteLocalRef(oResult);
-    CHECK_EXCEPTION
-    JDBC_MODULE_CATCH
 }
 
 void JdbcModule::initGlobals(const zorba::StaticContext* aStaticContext) {

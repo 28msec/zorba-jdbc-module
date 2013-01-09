@@ -8,5 +8,5 @@ variable $connection := jdbc:connect({
 jdbc:execute-update($connection, "DROP DATABASE `School`;");
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); true() }
+ then { true() }
  else false()

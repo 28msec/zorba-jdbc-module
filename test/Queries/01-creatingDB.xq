@@ -59,5 +59,5 @@ INSERT  INTO `students`(`idStudent`,`Name`,`Address`,`Birthday`,`Weight`) VALUES
 
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); true() }
+ then { true() }
  else false()

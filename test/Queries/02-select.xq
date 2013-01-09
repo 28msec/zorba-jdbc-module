@@ -15,5 +15,5 @@ WHERE idCourse=1
 ");
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); $data }
+ then { $data }
  else false()

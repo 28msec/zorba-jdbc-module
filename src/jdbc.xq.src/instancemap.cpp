@@ -58,8 +58,14 @@ InstanceMap::deleteInstance(const String& aKeyName)
   if (lIter == instanceMap->end())
     return false;
 
-  //lIter->second;
-  //Example: do anything you need to finalize object
+  JDBC_MODULE_TRY
+    if (id == INSTANCE_MAP_CONNECTIONS) {
+      env->CallVoidMethod(lIter->second, jConnection.close);
+      CHECK_EXCEPTION
+    }
+    env->DeleteLocalRef(lIter->second);
+    CHECK_EXCEPTION
+  JDBC_MODULE_CATCH
 
   instanceMap->erase(lIter);
 
@@ -74,8 +80,14 @@ InstanceMap::destroy() throw()
     for (InstanceMap_t::const_iterator lIter = instanceMap->begin();
          lIter != instanceMap->end(); ++lIter)
     {
-      //lIter->second;
-      //Example: do anything you need to finalize object
+    JDBC_MODULE_TRY
+      if (id == INSTANCE_MAP_CONNECTIONS) {
+        env->CallVoidMethod(lIter->second, jConnection.close);
+        CHECK_EXCEPTION
+      }
+      env->DeleteLocalRef(lIter->second);
+      CHECK_EXCEPTION
+    JDBC_MODULE_CATCH
     }
     instanceMap->clear();
     delete instanceMap;

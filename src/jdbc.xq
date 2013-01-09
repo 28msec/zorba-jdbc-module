@@ -106,21 +106,7 @@ declare %an:sequential function jdbc:connect(
                                      $options as object()?) as xs:anyURI external;
 
 (:~
- : 2.2 Closes an open database connection.
- :
- : @param $connection-id The identifier to connection to be closed.
- :
- : @error SQL08003 Connection doesn't exist
- : @error SQL01002 Disconnection failed
- : @error SQL001 Descriptive error, see error in attached message
- :
- : @return This function returns an empty-sequence()
- :)
-declare %an:sequential function jdbc:disconnect(
-                                     $connection-id as xs:anyURI) as empty-sequence() external;
-
-(:~
- : 2.3 Verify if a connection is still active.
+ : 2.2 Verify if a connection is still active.
  :
  : @param $connection-id The identifier to the connection to be verify.
  :
@@ -133,7 +119,7 @@ declare function jdbc:is-connected(
                                      $connection-id as xs:anyURI) as xs:boolean external;
 
 (:~
- : 2.4 Returns a set with options for a specified connection.
+ : 2.3 Returns a set with options for a specified connection.
  :
  : @param $connection-id The identifier to the connection to be verify.
  :

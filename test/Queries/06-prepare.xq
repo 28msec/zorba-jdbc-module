@@ -20,5 +20,5 @@ variable $data-set := jdbc:execute-prepared($prep-stat);
 variable $data := jdbc:result-set($data-set);
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); $data }
+ then { $data }
  else false()

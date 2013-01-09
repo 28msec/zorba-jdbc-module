@@ -10,5 +10,5 @@ jdbc:execute-update($connection, "USE `School`;");
 variable $data := jdbc:connection-options($connection);
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); $data }
+ then { $data }
  else false()

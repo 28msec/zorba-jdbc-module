@@ -17,5 +17,5 @@ WHERE idCourse=1
 variable $data := jdbc:result-set($data-set);
 
 if (jdbc:is-connected($connection))
- then { jdbc:disconnect($connection); $data }
+ then { $data }
  else false()

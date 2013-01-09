@@ -34,6 +34,8 @@ class InstanceMap : public ExternalFunctionParameter
     InstanceMap_t* instanceMap;
 
   public:
+    String id;
+
     InstanceMap();
     
     bool

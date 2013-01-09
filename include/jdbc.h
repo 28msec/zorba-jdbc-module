@@ -99,6 +99,7 @@ class JdbcModule : public ExternalModule {
 
     virtual void destroy()
     {
+
       delete this;
     }
 
