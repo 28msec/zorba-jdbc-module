@@ -69,6 +69,7 @@ JavaResultSet         jResultSet;
 JavaResultSetMetadata jResultSetMetadata;
 JavaPreparedStatement jPreparedStatement;
 JavaParameterMetadata jParameterMetadata;
+JavaBlob              jBlob;
 bool isOutputJSON = true;
 
 zorba::ExternalFunction* 
@@ -333,6 +334,7 @@ void JdbcModule::initGlobals(const zorba::StaticContext* aStaticContext) {
     jResultSetMetadata.init();
     jPreparedStatement.init();
     jParameterMetadata.init();
+    jBlob.init();
     SQLTypes::init();
   JDBC_MODULE_CATCH
 }

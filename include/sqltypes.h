@@ -71,6 +71,8 @@ class SQLTypes
     static void init();
     static bool isInt(long lType);
     static bool isFloat(long lType);
+    static bool isString(long lType);
+    static bool isBLOB(long lType);
 
 };
 
