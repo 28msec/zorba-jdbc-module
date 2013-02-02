@@ -89,17 +89,6 @@ namespace jdbc
           } else {
             aValue = itemFactory->createJSONNull();
           }
-        } else if (SQLTypes::isString(columnTypes[i])) {
-          jstring sValue = (jstring) env->CallObjectMethod(oResultSet, jResultSet.getString, i+1);
-          CHECK_EXCEPTION
-          if (sValue!=NULL) {
-            const char *value = env->GetStringUTFChars(sValue, 0);
-            CHECK_EXCEPTION
-            aValue = itemFactory->createString(String(value));
-            env->ReleaseStringUTFChars(sValue, value);
-          } else {
-            aValue = itemFactory->createJSONNull();
-          }
         } else if (SQLTypes::isBLOB(columnTypes[i])) {
           jobject oBlob = env->CallObjectMethod(oResultSet, jResultSet.getBLOB, i+1);
           CHECK_EXCEPTION
