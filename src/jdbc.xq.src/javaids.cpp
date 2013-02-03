@@ -70,6 +70,7 @@ namespace jdbc
     getInt = env->GetMethodID(classID, "getInt", "(I)I");
     getDouble = env->GetMethodID(classID, "getDouble", "(I)D");
     getString = env->GetMethodID(classID, "getString", "(I)Ljava/lang/String;");
+    getBLOB = env->GetMethodID(classID, "getBlob", "(I)Ljava/sql/Blob;");
     return true;
   }
   bool JavaResultSetMetadata::init() {
@@ -111,7 +112,12 @@ namespace jdbc
     getParameterType = env->GetMethodID(classID, "getParameterType", "(I)I");
     return true;
   }
-
+  bool JavaBlob::init() {
+    classID = env->FindClass("java/sql/Blob");
+    getBytes = env->GetMethodID(classID, "getBytes", "(JI)[B");
+    length = env->GetMethodID(classID, "length", "()J");
+    return true;
+  }
 
 }}; // namespace zorba, jdbc
 

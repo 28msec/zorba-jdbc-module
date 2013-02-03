@@ -77,6 +77,7 @@ public:
   jmethodID getInt;
   jmethodID getDouble;
   jmethodID getString;
+  jmethodID getBLOB;
 };
 class JavaResultSetMetadata {
 public:
@@ -119,6 +120,13 @@ public:
   jmethodID getParameterTypeName;
   jmethodID getParameterClassName;
   jmethodID getParameterType;
+};
+class JavaBlob {
+public:
+  bool init();
+  jclass classID;
+  jmethodID getBytes;
+  jmethodID length;
 };
 
 
