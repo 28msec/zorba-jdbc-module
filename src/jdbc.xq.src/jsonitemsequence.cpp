@@ -34,8 +34,6 @@ namespace jdbc
       CHECK_EXCEPTION
       columnCount = env->CallIntMethod(oMetadata, jResultSetMetadata.getColumnCount);
       CHECK_EXCEPTION
-      env->CallVoidMethod(oResultSet, jResultSet.beforeFirst);
-      CHECK_EXCEPTION
 
       // Getting column names and types
       columnNames = new String[columnCount];
