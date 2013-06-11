@@ -53,7 +53,7 @@ public:
   jmethodID close;
   jmethodID createStatement;
   jmethodID prepareStatement;
-
+  jmethodID getMetadata;	
 };
 class JavaStatement {
 public:
@@ -75,8 +75,10 @@ public:
   jmethodID beforeFirst;
   jmethodID next;
   jmethodID getInt;
+  jmethodID getBoolean;
   jmethodID getDouble;
   jmethodID getString;
+  jmethodID getBLOB;
 };
 class JavaResultSetMetadata {
 public:
@@ -120,7 +122,19 @@ public:
   jmethodID getParameterClassName;
   jmethodID getParameterType;
 };
-
+class JavaBlob {
+public:
+  bool init();
+  jclass classID;
+  jmethodID getBytes;
+  jmethodID length;
+};
+class JavaDatabaseMetadata {
+public:
+  bool init();
+  jclass classID;
+  jmethodID getTables;
+};
 
 }}; // namespace zorba, jdbc
 

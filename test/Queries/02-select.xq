@@ -5,9 +5,9 @@ variable $connection := jdbc:connect({
   "user" : "root",
   "password" : ""});
   
-jdbc:execute-update($connection, "CREATE DATABASE /*!32312 IF NOT EXISTS*/`School` /*!40100 DEFAULT CHARACTER SET latin1 */;");
+jdbc:execute-update($connection, "CREATE DATABASE /*!32312 IF NOT EXISTS*/`School02` /*!40100 DEFAULT CHARACTER SET latin1 */;");
   
-jdbc:execute-update($connection, "USE `School`;");
+jdbc:execute-update($connection, "USE `School02`;");
 
 (: Table structures :)
 

@@ -43,6 +43,7 @@ namespace jdbc
     close = env->GetMethodID(classID, "close", "()V");
     createStatement = env->GetMethodID(classID, "createStatement", "()Ljava/sql/Statement;");
     prepareStatement = env->GetMethodID(classID, "prepareStatement", "(Ljava/lang/String;)Ljava/sql/PreparedStatement;");
+    getMetadata = env->GetMethodID(classID, "getMetaData", "()Ljava/sql/DatabaseMetaData;");
 
     TRANSACTION_NONE = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_NONE", "I"));
     TRANSACTION_READ_UNCOMMITTED = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "TRANSACTION_READ_UNCOMMITTED", "I"));
@@ -68,8 +69,10 @@ namespace jdbc
     beforeFirst = env->GetMethodID(classID, "beforeFirst", "()V");
     next = env->GetMethodID(classID, "next", "()Z");
     getInt = env->GetMethodID(classID, "getInt", "(I)I");
+    getBoolean = env->GetMethodID(classID, "getBoolean", "(I)Z");
     getDouble = env->GetMethodID(classID, "getDouble", "(I)D");
     getString = env->GetMethodID(classID, "getString", "(I)Ljava/lang/String;");
+    getBLOB = env->GetMethodID(classID, "getBlob", "(I)Ljava/sql/Blob;");
     return true;
   }
   bool JavaResultSetMetadata::init() {
@@ -84,6 +87,11 @@ namespace jdbc
     COLUMN_NO_NULLS = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNoNulls", "I"));
     COLUMN_NULLABLE = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNullable", "I"));
     COLUMN_NULLABLE_UNKNOWN = env->GetStaticIntField(classID, env->GetStaticFieldID(classID, "columnNullableUnknown", "I"));
+    return true;
+  }
+  bool JavaDatabaseMetadata::init() {
+    classID = env->FindClass("java/sql/DatabaseMetaData");
+    getTables = env->GetMethodID(classID, "getTables", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/ResultSet;");
     return true;
   }
   bool JavaPreparedStatement::init() {
@@ -111,7 +119,12 @@ namespace jdbc
     getParameterType = env->GetMethodID(classID, "getParameterType", "(I)I");
     return true;
   }
-
+  bool JavaBlob::init() {
+    classID = env->FindClass("java/sql/Blob");
+    getBytes = env->GetMethodID(classID, "getBytes", "(JI)[B");
+    length = env->GetMethodID(classID, "length", "()J");
+    return true;
+  }
 
 }}; // namespace zorba, jdbc
 

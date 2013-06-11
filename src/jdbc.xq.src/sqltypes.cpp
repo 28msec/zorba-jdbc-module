@@ -101,13 +101,32 @@ void SQLTypes::init() {
     VARCHAR   = env->GetStaticIntField(cTypes, env->GetStaticFieldID(cTypes, "VARCHAR", "I"));
 }
 
+bool SQLTypes::isBLOB(long lType) {
+  return (
+          (lType == BINARY) || (lType == BLOB) || (lType==LONGVARBINARY) || (lType==VARBINARY) ||
+          (lType == ARRAY) || (lType == DATALINK) || (lType==JAVA_OBJECT) || (lType==OTHER) ||
+          (lType == REF)
+         );
+}
+
+bool SQLTypes::isString(long lType) {
+  return (
+          (lType == CHAR) || (lType == CLOB) || (lType == LONGVARCHAR) || (lType==LONGNVARCHAR) || 
+          (lType==NCHAR) || (lType==NCLOB) || (lType==NVARCHAR) || (lType==VARCHAR) ||
+          (lType==DATE) || (lType==TIME) || (lType==TIMESTAMP) || (lType==SQLXML) 
+          );
+}
+
 bool SQLTypes::isInt(long lType){
-  return ( (lType == INTEGER) || (lType==BIGINT) || (lType==TINYINT) || (lType==BIT) );
+  return ( (lType == INTEGER) || (lType==BIGINT) || (lType==TINYINT) || (lType==SMALLINT) );
 }
 
 bool SQLTypes::isFloat(long lType){
   return ((lType == DECIMAL) || (lType==DOUBLE) || (lType==FLOAT) || (lType==NUMERIC) || (lType==REAL) );
 }
 
+bool SQLTypes::isBoolean(long lType){
+  return ((lType == BOOLEAN) || (lType==BIT) );
+}
 
 }}; // namespace zorba, jdbc
