@@ -67,6 +67,4 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
   return ItemSequence_t(new SingletonItemSequence(result));
 }
 
-
-
 }}; // namespace zorba, jdbc
