@@ -570,6 +570,20 @@ declare %an:sequential function jdbc:tables(
                                       $schema as xs:string?, 
                                       $table as xs:string?) as object()* external;
 
+(:~
+ :
+ : Return the list of tables from a connection
+ :
+ : @param $connection-id The identifier to a connection.
+ :
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :)
 declare %an:sequential function jdbc:tables(
                                       $connection-id as xs:anyURI) as object()*
 {
