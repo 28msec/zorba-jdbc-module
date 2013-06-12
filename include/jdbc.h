@@ -49,6 +49,7 @@ extern JavaConnection        jConnection;
 extern JavaStatement         jStatement;
 extern JavaResultSet         jResultSet;
 extern JavaResultSetMetadata jResultSetMetadata;
+extern JavaDatabaseMetadata  jDatabaseMetadata;
 extern JavaPreparedStatement jPreparedStatement;
 extern JavaParameterMetadata jParameterMetadata;
 extern JavaBlob              jBlob;
@@ -106,6 +107,9 @@ class JdbcModule : public ExternalModule {
 
     static String 
       getStringArg(const ExternalFunction::Arguments_t& args, int index);
+
+    static bool 
+      getOptionalStringArg(const ExternalFunction::Arguments_t& args, int index, String& aRes);
 
     static Item 
       getItemArg(const ExternalFunction::Arguments_t& args, int index);

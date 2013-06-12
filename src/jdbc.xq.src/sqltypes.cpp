@@ -118,11 +118,15 @@ bool SQLTypes::isString(long lType) {
 }
 
 bool SQLTypes::isInt(long lType){
-  return ( (lType == INTEGER) || (lType==BIGINT) || (lType==TINYINT) || (lType==SMALLINT) || (lType==BIT) );
+  return ( (lType == INTEGER) || (lType==BIGINT) || (lType==TINYINT) || (lType==SMALLINT) );
 }
 
 bool SQLTypes::isFloat(long lType){
   return ((lType == DECIMAL) || (lType==DOUBLE) || (lType==FLOAT) || (lType==NUMERIC) || (lType==REAL) );
+}
+
+bool SQLTypes::isBoolean(long lType){
+  return ((lType == BOOLEAN) || (lType==BIT) );
 }
 
 }}; // namespace zorba, jdbc

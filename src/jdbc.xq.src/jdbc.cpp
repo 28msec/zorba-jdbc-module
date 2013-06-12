@@ -53,6 +53,7 @@
 #include "metadata.h"
 #include "resultset.h"
 #include "closedataset.h"
+#include "tables.h"
 
 
 namespace zorba
@@ -66,6 +67,7 @@ JavaConnection        jConnection;
 JavaStatement         jStatement;
 JavaResultSet         jResultSet;
 JavaResultSetMetadata jResultSetMetadata;
+JavaDatabaseMetadata  jDatabaseMetadata;
 JavaPreparedStatement jPreparedStatement;
 JavaParameterMetadata jParameterMetadata;
 JavaBlob              jBlob;
@@ -181,6 +183,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new CloseDataSetFunction(this);
     }
+  else if (localName == "tables")
+    {
+      lFunc = new TablesFunction(this);
+    }
   }
   return lFunc;
 }
@@ -263,6 +269,21 @@ JdbcModule::getStringArg(const ExternalFunction::Arguments_t& args, int index) {
   return result;
 }
 
+bool
+JdbcModule::getOptionalStringArg(const ExternalFunction::Arguments_t& args, int index, String& aRes) {
+  Iterator_t lIter = args[index]->getIterator();
+  lIter->open();
+  Item item;
+  if( lIter->next(item) )
+  {
+    aRes = item.getStringValue();
+    lIter->close();
+    return true;
+  }
+  lIter->close();
+  return false;
+}
+
 Item
 JdbcModule::getItemArg(const ExternalFunction::Arguments_t& args, int index) {
   Item item;
@@ -331,6 +352,7 @@ void JdbcModule::initGlobals(const zorba::StaticContext* aStaticContext) {
     jStatement.init();
     jResultSet.init();
     jResultSetMetadata.init();
+    jDatabaseMetadata.init();
     jPreparedStatement.init();
     jParameterMetadata.init();
     jBlob.init();

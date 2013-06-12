@@ -73,6 +73,7 @@ class SQLTypes
     static bool isFloat(long lType);
     static bool isString(long lType);
     static bool isBLOB(long lType);
+    static bool isBoolean(long lType);
 
 };
 
