@@ -543,3 +543,49 @@ declare function jdbc:affected-rows(
  :)
 declare %an:sequential function jdbc:close-dataset(
                                       $dataset-id as xs:anyURI) as empty-sequence() external;
+
+(:~
+ : Return the list of tables from a connection
+ :
+ : @param $connection-id The identifier to a connection.
+ : @param $catalog A filter of the catalog name of the tables.
+ :             Send empty-sequence for all tables.
+ : @param $schema A filter of the schema name of the tables.
+ :             Send empty-sequence for all tables.
+ : @param $table A filter of the name of the tables.
+ :             Send empty-sequence for all tables.
+ : 
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :
+ :)
+declare %an:sequential function jdbc:tables(
+                                      $connection-id as xs:anyURI, 
+                                      $catalog as xs:string?, 
+                                      $schema as xs:string?, 
+                                      $table as xs:string?) as object()* external;
+
+(:~
+ :
+ : Return the list of tables from a connection
+ :
+ : @param $connection-id The identifier to a connection.
+ :
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :)
+declare %an:sequential function jdbc:tables(
+                                      $connection-id as xs:anyURI) as object()*
+{
+	jdbc:tables($connection-id, (), (), ())
+};

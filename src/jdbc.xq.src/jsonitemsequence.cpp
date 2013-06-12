@@ -47,6 +47,16 @@ namespace jdbc
         env->ReleaseStringUTFChars(oName, cName);
         CHECK_EXCEPTION 
         columnTypes[i] = env->CallIntMethod(oMetadata, jResultSetMetadata.getColumnType, i+1);
+
+        if (columnTypes[i] == SQLTypes::BINARY)
+        {
+          jstring oType = (jstring) env->CallObjectMethod(oMetadata, jResultSetMetadata.getColumnTypeName, i+1);
+          CHECK_EXCEPTION
+          const char * cType = env->GetStringUTFChars(oType, 0);
+          CHECK_EXCEPTION
+          if (strcmp(cType, "timestamp") == 0) columnTypes[i] = SQLTypes::TIMESTAMP;
+        }
+
         CHECK_EXCEPTION
       }
     JDBC_MODULE_CATCH
@@ -71,11 +81,15 @@ namespace jdbc
         if (SQLTypes::isInt(columnTypes[i])) {
           int value = env->CallIntMethod(oResultSet, jResultSet.getInt, i+1);
           CHECK_EXCEPTION
-          aValue = itemFactory->createInt(value);
+          aValue = itemFactory->createInteger(value);
         } else if (SQLTypes::isFloat(columnTypes[i])) {
           double value = env->CallDoubleMethod(oResultSet, jResultSet.getDouble, i+1);
           CHECK_EXCEPTION
           aValue = itemFactory->createDouble(value);
+        } else if (SQLTypes::isBoolean(columnTypes[i])) {
+            bool value = env->CallBooleanMethod(oResultSet, jResultSet.getBoolean, i+1);
+          CHECK_EXCEPTION
+          aValue = itemFactory->createBoolean(value);
         } else if (SQLTypes::isString(columnTypes[i])) {
           jstring sValue = (jstring) env->CallObjectMethod(oResultSet, jResultSet.getString, i+1);
           CHECK_EXCEPTION
@@ -95,7 +109,7 @@ namespace jdbc
             CHECK_EXCEPTION
             jbyteArray bytes  = (jbyteArray) env->CallObjectMethod(oBlob, jBlob.getBytes, 1, length);
             CHECK_EXCEPTION
-            const char* byteString = (const char*)(env->GetByteArrayElements(bytes, 0));
+            const unsigned char* byteString = reinterpret_cast<const unsigned char*>(env->GetByteArrayElements(bytes, 0));
             aValue = itemFactory->createBase64Binary(byteString, length);
           } else {
             aValue = itemFactory->createJSONNull();
