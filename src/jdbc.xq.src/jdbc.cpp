@@ -183,12 +183,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new CloseDataSetFunction(this);
     }
-#if 0
     else if (localName == "tables")
     {
       lFunc = new TablesFunction(this);
     }
-#endif
   }
   return lFunc;
 }
