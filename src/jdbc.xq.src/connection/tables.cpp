@@ -23,6 +23,27 @@ namespace zorba
 namespace jdbc
 {
 
+TablesFunction::TablesFunction(const ExternalModule* aModule)
+  : theModule(aModule),
+    theFactory(Zorba::getInstance(0)->getItemFactory()),
+    theDataManager(Zorba::getInstance(0)->getXmlDataManager())
+{}
+
+TablesFunction::~TablesFunction()
+{}
+
+String
+TablesFunction::getURI() const
+{
+  return theModule->getURI();
+}
+
+String
+TablesFunction::getLocalName() const
+{
+  return "tables";
+}
+
 ItemSequence_t
 TablesFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,

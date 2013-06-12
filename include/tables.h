@@ -35,21 +35,14 @@ class TablesFunction : public ContextualExternalFunction
     XmlDataManager* theDataManager;
 
   public:
-    TablesFunction(const ExternalModule* aModule) :
-      theModule(aModule),
-      theFactory(Zorba::getInstance(0)->getItemFactory()),
-      theDataManager(Zorba::getInstance(0)->getXmlDataManager())
-    {}
+    TablesFunction(const ExternalModule* aModule);
 
-    ~TablesFunction()
-    {}
+    virtual ~TablesFunction();
 
   public:
-    virtual String getURI() const
-    { return theModule->getURI(); }
+    virtual String getURI() const;
 
-    virtual String getLocalName() const
-    { return "tables"; }
+    virtual String getLocalName() const;
 
     virtual ItemSequence_t 
       evaluate(const ExternalFunction::Arguments_t& args,
@@ -57,7 +50,4 @@ class TablesFunction : public ContextualExternalFunction
                const zorba::DynamicContext*) const;
 };
 
-
-
-}}; // namespace zorba, jdbc
-
+}} // namespace zorba, jdbc
