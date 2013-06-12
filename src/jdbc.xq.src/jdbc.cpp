@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#include <zorba/base64.h>
-#include <zorba/empty_sequence.h>
 #include <zorba/diagnostic_list.h>
-#include <zorba/function.h>
+#include <zorba/empty_sequence.h>
 #include <zorba/external_module.h>
-#include <zorba/user_exception.h>
+#include <zorba/function.h>
 #include <zorba/item_factory.h>
 #include <zorba/serializer.h>
 #include <zorba/singleton_item_sequence.h>
+#include <zorba/user_exception.h>
+#include <zorba/util/base64_util.h>
 #include <zorba/vector_item_sequence.h>
 #include <zorba/zorba.h>
 
