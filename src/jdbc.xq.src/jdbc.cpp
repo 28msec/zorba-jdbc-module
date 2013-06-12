@@ -183,10 +183,12 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new CloseDataSetFunction(this);
     }
-  else if (localName == "tables")
+#if 0
+    else if (localName == "tables")
     {
       lFunc = new TablesFunction(this);
     }
+#endif
   }
   return lFunc;
 }
@@ -373,3 +375,4 @@ extern "C" DLL_EXPORT zorba::ExternalModule* createModule()
 {
   return new zorba::jdbc::JdbcModule();
 }
+/* vim:set et sw=2 ts=2: */
