@@ -21,7 +21,7 @@ xquery version "3.0";
  : using jvm-util module to handle Java interaction.
  :
  : @author Rodolfo Ochoa
- : @project other data sources/jdbc module
+ : @project DB Drivers/JDBC
  :)
 
 module namespace jdbc = "http://www.zorba-xquery.com/modules/jdbc";
