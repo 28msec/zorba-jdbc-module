@@ -109,8 +109,8 @@ namespace jdbc
             CHECK_EXCEPTION
             jbyteArray bytes  = (jbyteArray) env->CallObjectMethod(oBlob, jBlob.getBytes, 1, length);
             CHECK_EXCEPTION
-            const unsigned char* byteString = reinterpret_cast<const unsigned char*>(env->GetByteArrayElements(bytes, 0));
-            aValue = itemFactory->createBase64Binary(byteString, length);
+            const char* byteString = reinterpret_cast<const char*>(env->GetByteArrayElements(bytes, 0));
+            aValue = itemFactory->createBase64Binary(byteString, length, false);
           } else {
             aValue = itemFactory->createJSONNull();
           } 
