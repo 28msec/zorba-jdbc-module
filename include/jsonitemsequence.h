@@ -19,8 +19,11 @@
 
 #include <map>
 #include <string>
+#include <jni.h>
+
 #include <zorba/zorba.h>
-#include "jni.h"
+#include <zorba/iterator.h>
+#include <zorba/item_sequence.h>
 
 namespace zorba
 {
