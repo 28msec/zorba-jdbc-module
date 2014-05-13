@@ -57,7 +57,20 @@ class ExecuteQueryFunction : public ContextualExternalFunction
                const zorba::DynamicContext*) const;
 };
 
+class ExecuteQueryNondeterministicFunction : public ExecuteQueryFunction
+{
+    public:
+    ExecuteQueryNondeterministicFunction(const ExternalModule* aModule) :
+      ExecuteQueryFunction(aModule)
+    {}
 
+    ~ExecuteQueryNondeterministicFunction()
+    {}
+
+  public:
+    virtual String getLocalName() const
+    { return "execute-query-nondeterministic"; }
+};
 
 }}; // namespace zorba, jdbc
 

@@ -29,9 +29,9 @@ ClosePreparedFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
-  CHECK_CONNECTION
-  
   String lStatementUUID = JdbcModule::getStringArg(args, 0);
+
+  CHECK_CONNECTION
 
   JdbcModule::deleteObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 

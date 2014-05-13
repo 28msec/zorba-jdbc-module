@@ -50,4 +50,20 @@ class TablesFunction : public ContextualExternalFunction
                const zorba::DynamicContext*) const;
 };
 
+class TablesNondeterministicFunction : public TablesFunction
+{
+  public:
+    TablesNondeterministicFunction(const ExternalModule* aModule):
+      TablesFunction(aModule)
+    {};
+
+    virtual ~TablesNondeterministicFunction() {};
+
+  public:
+    virtual String getLocalName() const
+    {
+      return "tables-nondeterministic";
+    }
+};
+
 }} // namespace zorba, jdbc

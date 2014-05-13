@@ -30,12 +30,13 @@ ExecuteUpdateFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
+  String lConnectionUUID = JdbcModule::getStringArg(args, 0);
+  String lQuery = JdbcModule::getStringArg(args, 1);
+
   CHECK_CONNECTION
   Item result;
 
   JDBC_MODULE_TRY
-    String lConnectionUUID = JdbcModule::getStringArg(args, 0);
-    String lQuery = JdbcModule::getStringArg(args, 1);
     
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lConnectionUUID, INSTANCE_MAP_CONNECTIONS);
 

@@ -57,6 +57,21 @@ class ConnectFunction : public ContextualExternalFunction
                const zorba::DynamicContext*) const;
 };
 
+class ConnectNondeterministicFunction : public ConnectFunction
+{
+  public:
+    ConnectNondeterministicFunction(const ExternalModule* aModule) :
+      ConnectFunction(aModule)
+    {}
+
+    ~ConnectNondeterministicFunction()
+    {}
+
+  public:
+    virtual String getLocalName() const
+    { return "connect-nondeterministic"; }
+};
+
 
 
 }}; // namespace zorba, jdbc

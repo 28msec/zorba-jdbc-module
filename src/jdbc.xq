@@ -20,7 +20,33 @@ xquery version "3.0";
  : This module contains functions to connect to any JDBC datasource 
  : using jvm-util module to handle Java interaction.
  :
+ : <h2 id="determinism">Important Notice Regarding Function Determinism</h2>
+ : <p>The non side-effecting functions:
+ : <ul>
+ :   <li><a href="#connect-1">connect#1</a></li>
+ :   <li><a href="#connect-2">connect#2</a></li>
+ :   <li><a href="#execute-query-2">execute-query#2</a></li>
+ :   <li><a href="#execute-query-prepared-1">execute-query-prepared#1</a></li>
+ :   <li><a href="#tables-1">tables#1</a></li>
+ :   <li><a href="#tables-4">tables#4</a></li>
+ : </ul>
+ : are declared deterministic, which means that their results could be cached 
+ : when invoked multiple times with the same arguments in the same query execution.</p>
+ :   
+ : <p>To not use cached results you can use the following alternative functions:
+ : <ul>
+ :   <li><a href="#connect-notdeterministic-0">connect-notdeterministic#0</a></li>
+ :   <li><a href="#connect-notdeterministic-1">connect-notdeterministic#1</a></li>
+ :   <li><a href="#connect-notdeterministic-2">connect-notdeterministic#2</a></li>
+ :   <li><a href="#execute-query-notdeterministic-2">execute-query-notdeterministic#2</a></li>
+ :   <li><a href="#execute-query-prepared-notdeterministic-1">execute-query-prepared-notdeterministic#1</a></li>
+ :   <li><a href="#tables-notdeterministic-1">tables-notdeterministic#1</a></li>
+ :   <li><a href="#tables-notdeterministic-4">tables-notdeterministic#4</a></li>
+ : </ul>
+ : which have been declared as being non deterministic.</p>
+ :
  : @author Rodolfo Ochoa
+ : @author Federico Cavalieri
  : @project DB Drivers/JDBC
  :)
 
@@ -58,10 +84,20 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
 
 (:~
  : Opens a connection to a database.
- : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
+ :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : <p>Returns a URI identifying the connection that has been opened. The 
+ : implementing code determines from the $connection-config either explicitly 
+ : (interpreting the driver attribute) or implicitly (using the type attribute) 
+ : which driver it has to load.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
  :
  : @param $connection-config json object that has the host and user informations.
- : @option "url" URL of the server, this option must be specified and should be declared according to JDBC specification.
+ : @option "url" URL of the server, this option must be specified and should be 
+ :         declared according to JDBC specification.
  : @option "user" username for the server, this is optional.
  : @option "password" password for the server, this is optional.
  :
@@ -73,17 +109,52 @@ declare variable $jdbc:SERIALIZABLE     := "SERIALIZABLE";
  : @return Return an identifier that represents the connection to the server.
  :
  : Connection coonfiguration example:
- : { "url" : "jdbc:mysql://localhost/", 
+ : { 
+ :   "url" : "jdbc:mysql://localhost/", 
  :   "user" : "root",
  :   "password" : "" }
  : 
  :)
-declare %an:sequential function jdbc:connect(
-                                     $connection-config as object() ) as xs:anyURI external;
+declare function jdbc:connect(
+                         $connection-config as object() ) as xs:anyURI external;
+
+(:~
+ : Opens a connection to a database.
+ :
+ : <p>This function has the same semantics as <a href="#connect-1">connect#1</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $connection-config json object that has the host and user informations.
+ : @option "url" URL of the server, this option must be specified and should be 
+ :         declared according to JDBC specification.
+ : @option "user" username for the server, this is optional.
+ : @option "password" password for the server, this is optional.
+ :
+ : @error SQL28000 Authentication failed.
+ : @error SQL08001 Connection error.
+ : @error SQL40003 Isolation level not supported.
+ : @error SQL001 Descriptive error, see attached message.
+ :
+ : @return Return an identifier that represents the connection to the server.
+ :)
+declare %an:nondeterministic function jdbc:connect-nondeterministic(
+                                 $connection-config as object() ) as xs:anyURI external;
 
 (:~
  : Opens a connection to a database with specified options.
- : Returns a URI identifying the connection that has been opened. The implementing code determines from the $connection-config either explicitly (interpreting the driver attribute) or implicitly (using the type attribute) which driver it has to load.
+ :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : <p>Returns a URI identifying the connection that has been opened. The 
+ : implementing code determines from the $connection-config either explicitly 
+ : (interpreting the driver attribute) or implicitly (using the type attribute) 
+ : which driver it has to load.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
  :
  : @param $connection-config json object that has the host and user informations.
  : @option "url" URL of the server, this option must be specified and should be declared according to JDBC specification.
@@ -102,7 +173,6 @@ declare %an:sequential function jdbc:connect(
  : if no isolation level is provided by the user the connection will be created with the default 
  : isolation level of the database.
  :
- :
  : @error SQL28000 Authentication failed.
  : @error SQL08001 Connection error.
  : @error SQL40003 Isolation level not supported.
@@ -116,7 +186,44 @@ declare %an:sequential function jdbc:connect(
  :   "isolation-level"? : $jdbc:READ-COMMITTED }
  : 
  :)
-declare %an:sequential function jdbc:connect(
+declare function jdbc:connect(
+                          $connection-config as object(), 
+                          $options as object()?) as xs:anyURI external;
+
+(:~
+ : Opens a connection to a database with specified options.
+ :
+ : <p>This function has the same semantics as <a href="#connect-2">connect#2</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $connection-config json object that has the host and user informations.
+ : @option "url" URL of the server, this option must be specified and should be declared according to JDBC specification.
+ : @option "user" username for the server, this option is optional.
+ : @option "password" password for the server, this option is optional.
+ : @param $options json object that specifies the connection options.
+ : @option "autocommit" The created connection will have autocommit turned on if the value the attribute is set to "true".
+ : @option "readonly" The created connection will be readonly if the value of the attribute is set to "true".
+ : @option "isolation-level" The created connection will have the specified transaction isolation level, 
+ : the following string typed in-scope variables represent the different transaction isolation levels 
+ : that this attribute can be set to:
+ : - $jsql:READ-COMMITTED
+ : - $jsql:READ-UNCOMMITTED
+ : - $jsql:REPEATABLE-READ
+ : - $jsql:SERIALIZABLE
+ : if no isolation level is provided by the user the connection will be created with the default 
+ : isolation level of the database.
+ :
+ : @error SQL28000 Authentication failed.
+ : @error SQL08001 Connection error.
+ : @error SQL40003 Isolation level not supported.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an identifier that represents the connection to the server.
+ :)
+declare %an:nondeterministic function jdbc:connect-nondeterministic(
                                      $connection-config as object(), 
                                      $options as object()?) as xs:anyURI external;
 
@@ -209,6 +316,11 @@ declare %an:sequential function jdbc:execute(
 (:~
  : Executes non-updating SQL statements.
  :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
  : @param $connection-id The identifier to an active connection.
  : @param $sql The query string to be executed.
  : 
@@ -228,6 +340,34 @@ declare function jdbc:execute-query(
                                       $sql as xs:string) as object()* external;
 
 (:~
+ : Executes non-updating SQL statements.
+ :
+ : <p>This function has the same semantics as 
+ : <a href="#execute-query-2">execute-query#2</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $connection-id The identifier to an active connection.
+ : @param $sql The query string to be executed.
+ : 
+ : @error SQL08003 Connection doesn't exist.
+ : @error SQL08000 Connection is closed.
+ : @error SQL005 The statement is Updating type.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :
+ :)
+declare %an:nondeterministic function jdbc:execute-query-nondeterministic( 
+                                      $connection-id as xs:anyURI, 
+                                      $sql as xs:string) as object()* external;
+
+(:~
  : Executes updating SQL statements.
  :
  : @param $connection-id The identifier to an active connection.
@@ -240,7 +380,7 @@ declare function jdbc:execute-query(
  :
  : @return Returns an xs:integer with the number of affected rows.
  :)
-declare function jdbc:execute-update(
+declare %an:sequential function jdbc:execute-update(
                                       $connection-id as xs:anyURI,
                                       $sql as xs:string) as xs:integer external;
 
@@ -326,7 +466,8 @@ declare %an:sequential function jdbc:set-boolean(
                                       $value as xs:boolean) as empty-sequence() external;
 
 (:~
- : Set the value of the designated parameter with the given value, this function will assign only null values if possible.
+ : Set the value of the designated parameter with the given value, this function 
+ : will assign only null values if possible.
  :
  : @param $prepared-statement The identifier to a prepared statement.
  : @param $parameter-index The index from the parameter to be set.
@@ -419,6 +560,11 @@ declare %an:sequential function jdbc:execute-prepared(
 (:~
  : Executes a non-updating SQL statement prepared with 5.1 jsql:prepare-statement.
  :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
  : @param $prepared-statement The identifier to a prepared statement.
  : 
  : @error SQL003 Prepared statement doesn't exist.
@@ -433,6 +579,31 @@ declare %an:sequential function jdbc:execute-prepared(
  :)
 declare function jdbc:execute-query-prepared(
                                       $prepared-statement as xs:anyURI) as object()* external;
+                                      
+(:~
+ : Executes a non-updating SQL statement prepared with 5.1 jsql:prepare-statement.
+ :
+ : <p>This function has the same semantics as 
+ : <a href="#execute-query-prepared-1">execute-query-prepared#1</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $prepared-statement The identifier to a prepared statement.
+ : 
+ : @error SQL003 Prepared statement doesn't exist.
+ : @error SQL005 The prepared statement is an updating query.
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query processed with the parameter values provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :)
+declare %an:nondeterministic function jdbc:execute-query-prepared-nondeterministic(
+                                      $prepared-statement as xs:anyURI) as object()* external;
 
 (:~
  : Executes an updating SQL statement prepared with 5.1 jsql:prepare-statement.
@@ -446,7 +617,7 @@ declare function jdbc:execute-query-prepared(
  :
  : @return Returns an xs:integer with the number of affected rows.
  :)
-declare function jdbc:execute-update-prepared(
+declare %an:sequential function jdbc:execute-update-prepared(
                                       $prepared-statement as xs:anyURI) as xs:integer external;
 
 (:~
@@ -547,6 +718,60 @@ declare %an:sequential function jdbc:close-dataset(
 (:~
  : Return the list of tables from a connection
  :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $connection-id The identifier to a connection.
+ :
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :)
+declare function jdbc:tables(
+                         $connection-id as xs:anyURI) as object()*
+{
+	jdbc:tables($connection-id, (), (), ())
+};
+
+(:~
+ : Return the list of tables from a connection
+ :
+ : <p>This function has the same semantics as <a href="#tables-1">tables#1</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
+ : @param $connection-id The identifier to a connection.
+ :
+ : @error SQL08000 Connection is closed.
+ : @error SQL001 Descriptive error, see error in attached message.
+ :
+ : @return Return an object with the result data rows from the query provided,
+ :  the data rows are defined as follows:
+ :   { column:value* }*
+ :  Every row is represented by an object of column-value representation of the returned SQL result.
+ :)
+declare %an:nondeterministic function jdbc:tables-nondeterministic(
+                         $connection-id as xs:anyURI) as object()*
+{
+	jdbc:tables-nondeterministic($connection-id, (), (), ())
+};
+
+(:~
+ : Return the list of tables from a connection
+ :
+ : <p>This function is declared as deterministic and should be used whenever result
+ : caching is acceptable.</p>
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
+ :
  : @param $connection-id The identifier to a connection.
  : @param $catalog A filter of the catalog name of the tables.
  :             Send empty-sequence for all tables.
@@ -564,28 +789,43 @@ declare %an:sequential function jdbc:close-dataset(
  :  Every row is represented by an object of column-value representation of the returned SQL result.
  :
  :)
-declare %an:sequential function jdbc:tables(
-                                      $connection-id as xs:anyURI, 
-                                      $catalog as xs:string?, 
-                                      $schema as xs:string?, 
-                                      $table as xs:string?) as object()* external;
+declare function jdbc:tables(
+                         $connection-id as xs:anyURI, 
+                         $catalog as xs:string?, 
+                         $schema as xs:string?, 
+                          $table as xs:string?) as object()* external;
 
 (:~
+ : Return the list of tables from a connection.
  :
- : Return the list of tables from a connection
+ : <p>This function has the same semantics as <a href="#tables-4">tables#4</a>, 
+ : but is declared as being non deterministic and thus should only be used when
+ : result caching is not desired.</p>
+ :
+ :
+ : @see <a href="#determinism">Notice about determinism</a>
  :
  : @param $connection-id The identifier to a connection.
- :
+ : @param $catalog A filter of the catalog name of the tables.
+ :             Send empty-sequence for all tables.
+ : @param $schema A filter of the schema name of the tables.
+ :             Send empty-sequence for all tables.
+ : @param $table A filter of the name of the tables.
+ :             Send empty-sequence for all tables.
+ : 
  : @error SQL08000 Connection is closed.
  : @error SQL001 Descriptive error, see error in attached message.
  :
  : @return Return an object with the result data rows from the query provided,
  :  the data rows are defined as follows:
  :   { column:value* }*
- :  Every row is represented by an object of column-value representation of the returned SQL result.
+ : Every row is represented by an object of column-value representation of the 
+ : returned SQL result.
+ :
  :)
-declare %an:sequential function jdbc:tables(
-                                      $connection-id as xs:anyURI) as object()*
-{
-	jdbc:tables($connection-id, (), (), ())
-};
+declare %an:nondeterministic function jdbc:tables-nondeterministic(
+                         $connection-id as xs:anyURI, 
+                         $catalog as xs:string?, 
+                         $schema as xs:string?, 
+                         $table as xs:string?) as object()* external;
+                          

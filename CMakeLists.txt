@@ -42,12 +42,14 @@ IF (zorba_util-jvm_module_FOUND)
     ADD_SUBDIRECTORY ("src")
 
     # Attempt to find the MySQL JDBC connector module (for tests).
-    IF (WIN32)
-      # getting connector from env var CONNECTOR_PATH
-      STRING(REGEX REPLACE "\\\\" "/" MYSQL_CONN_PATH "$ENV{CONNECTOR_PATH}")
-    ELSE (WIN32)
-      SET (MYSQL_CONN_PATH /usr/share/java ${Java_LIBRARIES})
-    ENDIF (WIN32)
+    IF (NOT DEFINED MYSQL_CONN_PATH)
+      IF (WIN32)
+        # getting connector from env var CONNECTOR_PATH
+        STRING(REGEX REPLACE "\\\\" "/" MYSQL_CONN_PATH "$ENV{CONNECTOR_PATH}")
+      ELSE (WIN32)
+        SET (MYSQL_CONN_PATH /usr/share/java ${Java_LIBRARIES})
+      ENDIF (WIN32)
+    ENDIF (NOT DEFINED MYSQL_CONN_PATH)
     ZORBA_FIND_JAR (MYSQL_CONN_JAR NAMES mysql-connector-java mysql
       PATHS ${MYSQL_CONN_PATH})
     IF (MYSQL_CONN_JAR)
