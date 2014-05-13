@@ -57,6 +57,21 @@ class ExecuteQueryPreparedFunction : public ContextualExternalFunction
                const zorba::DynamicContext*) const;
 };
 
+class ExecuteQueryPreparedNondeterministicFunction : public ExecuteQueryPreparedFunction
+{
+  public:
+  ExecuteQueryPreparedNondeterministicFunction(const ExternalModule* aModule) :
+      ExecuteQueryPreparedFunction(aModule)
+    {}
+
+    ~ExecuteQueryPreparedNondeterministicFunction()
+    {}
+
+  public:
+    virtual String getLocalName() const
+    { return "execute-query-prepared-nondeterministic"; }
+};
+
 
 
 }}; // namespace zorba, jdbc

@@ -87,6 +87,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ConnectFunction(this);
     }
+    else if (localName == "connect-nondeterministic")
+    {
+      lFunc = new ConnectNondeterministicFunction(this);
+    }
     else if (localName == "is-connected")
     {
       lFunc = new IsConnectedFunction(this);
@@ -112,6 +116,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     else if (localName == "execute-query")
     {
       lFunc = new ExecuteQueryFunction(this);
+    }
+    else if (localName == "execute-query-nondeterministic")
+    {
+      lFunc = new ExecuteQueryNondeterministicFunction(this);
     }
     else if (localName == "execute-update")
     {
@@ -158,6 +166,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     {
       lFunc = new ExecuteQueryPreparedFunction(this);
     }
+    else if (localName == "execute-query-prepared-nondeterministic")
+    {
+      lFunc = new ExecuteQueryPreparedNondeterministicFunction(this);
+    }
     else if (localName == "execute-update-prepared")
     {
       lFunc = new ExecuteUpdatePreparedFunction(this);
@@ -186,6 +198,10 @@ JdbcModule::getExternalFunction(const zorba::String& localName)
     else if (localName == "tables")
     {
       lFunc = new TablesFunction(this);
+    }
+    else if (localName == "tables-nondeterministic")
+    {
+      lFunc = new TablesNondeterministicFunction(this);
     }
   }
   return lFunc;

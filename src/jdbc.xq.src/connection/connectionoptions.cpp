@@ -28,11 +28,12 @@ ConnectionOptionsFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
+  String lStrUUID = JdbcModule::getStringArg(args, 0);
+
   CHECK_CONNECTION
   Item result;
 
   JDBC_MODULE_TRY
-    String lStrUUID = JdbcModule::getStringArg(args, 0);
 
     jobject oConnection = JdbcModule::getObject(aDynamincContext, lStrUUID, INSTANCE_MAP_CONNECTIONS);
 

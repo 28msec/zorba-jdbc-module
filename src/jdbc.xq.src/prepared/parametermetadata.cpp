@@ -29,12 +29,12 @@ ParameterMetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
+  String lStatementUUID = JdbcModule::getStringArg(args, 0);
+
   CHECK_CONNECTION
   Item result;
 
   JDBC_MODULE_TRY
-    String lStatementUUID = JdbcModule::getStringArg(args, 0);
-
     jobject oPreparedStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_PREPAREDSTATEMENTS);
 
     jobject oParameterMetaData = env->CallObjectMethod(oPreparedStatement, jPreparedStatement.getParameterMetaData);

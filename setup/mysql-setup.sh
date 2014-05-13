@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Default location to dump stuff and create databases
 WORKDIR=`pwd`/jdbc-module-mysql
@@ -10,7 +10,7 @@ DATADIR=${WORKDIR}/datadir
 LOGDIR=${WORKDIR}/log
 
 # Filename for download
-MYSQL_PKG=mysql-5.6.12-linux-glibc2.5-x86_64
+MYSQL_PKG=mysql-5.6.14-linux-glibc2.5-x86_64
 MYSQL_TGZ=${MYSQL_PKG}.tar.gz
 
 while getopts distchw: opt

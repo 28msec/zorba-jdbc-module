@@ -29,12 +29,12 @@ MetadataFunction::evaluate(const ExternalFunction::Arguments_t& args,
                            const zorba::StaticContext* aStaticContext,
                            const zorba::DynamicContext* aDynamincContext) const
 {
+  String lStatementUUID = JdbcModule::getStringArg(args, 0);
+
   CHECK_CONNECTION
   Item result;
 
   JDBC_MODULE_TRY
-    String lStatementUUID = JdbcModule::getStringArg(args, 0);
-
     jobject oStatement = JdbcModule::getObject(aDynamincContext, lStatementUUID, INSTANCE_MAP_STATEMENTS);
 
     zorba::ItemFactory* itemFactory = Zorba::getInstance(0)->getItemFactory();
