@@ -16,26 +16,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT (zorba_jdbc_module)
 
-MACRO (ZORBA_FIND_JNI)
-  IF (UNIX AND NOT APPLE)
-    # setting JAVA_HOME to bypass issues in FindJNI.cmake  
-    FIND_FILE(_JAVA_BIN_LOC NAMES java PATHS ENV PATH)
-    IF (_JAVA_BIN_LOC)
-      GET_FILENAME_COMPONENT(_JAVA_BIN_LOC "${_JAVA_BIN_LOC}" REALPATH) 
-      GET_FILENAME_COMPONENT(_JAVA_BIN_DIR ${_JAVA_BIN_LOC} PATH)
-      GET_FILENAME_COMPONENT(_JAVA_HOME "${_JAVA_BIN_DIR}/../.." ABSOLUTE)
-      MESSAGE(
-        STATUS "Generated JAVA_HOME to support FindJNI.cmake: " 
-        ${_JAVA_HOME})
-      SET(ENV{JAVA_HOME} ${_JAVA_HOME})
-    ENDIF()
-  ENDIF()
-
-  FIND_PACKAGE(JNI)
-ENDMACRO (ZORBA_FIND_JNI)
-
-
 FIND_PACKAGE (zorba_util-jvm_module QUIET)
+
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/config/UtilJavaUse.cmake)
 
 IF (zorba_util-jvm_module_FOUND)
   ZORBA_FIND_JNI()
