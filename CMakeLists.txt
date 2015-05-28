@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+MESSAGE(STATUS "Configuring external module <jdbc>")
+MESSAGE(STATUS "-------------------------------------------------------------")
+MESSAGE(STATUS "")
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT (zorba_jdbc_module)
@@ -65,11 +71,27 @@ IF (zorba_util-jvm_module_FOUND)
     ENDIF (MYSQL_CONN_JAR)
 
     DONE_DECLARING_ZORBA_URIS ()
+    
+    MESSAGE(STATUS "")
+    MESSAGE(STATUS "-------------------------------------------------------------")
+    MESSAGE(STATUS "Configuration SUCCEEDED for external module <jdbc>")
 
   ELSE (JNI_FOUND)
     MESSAGE (STATUS "Java and/or JNI not found; skipping jdbc module.")
+    
+    MESSAGE(STATUS "")
+    MESSAGE(STATUS "-------------------------------------------------------------")  
+    MESSAGE(STATUS "Configuration FAILED for external module <jdbc>")
+    
   ENDIF (JNI_FOUND)
 
 ELSE (zorba_util-jvm_module_FOUND)
   MESSAGE (STATUS "Zorba's util-jvm module not found; skipping jdbc module.")
+  
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "-------------------------------------------------------------")  
+  MESSAGE(STATUS "Configuration FAILED for external module <jdbc>")
+  
 ENDIF (zorba_util-jvm_module_FOUND)
+
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
